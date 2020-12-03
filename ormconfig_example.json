@@ -1,0 +1,9 @@
+{
+  "type": "pg",
+  "host": "localhost",
+  "port": 32774,
+  "username": "",
+  "password": "",
+  "database": "",
+  "entities": ["dist/**/*.entity{.ts,.js}"]
+}
