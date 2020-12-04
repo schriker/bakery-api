@@ -3,6 +3,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { GQLAuthGuard } from 'src/auth/guards/gql-local-auth.guard';
 import { GQLSessionGuard } from 'src/auth/guards/gql-session-auth.guard';
 import { CurrentUser } from './currentUser.decorator';
+import { CreateSellerArgs } from './dto/createSeller.args';
 import { CreateUserArgs } from './dto/createUser.args';
 import { ValidateUserArgs } from './dto/validateUser.args';
 import { User } from './entities/user.entity';
@@ -14,11 +15,14 @@ export class UsersResolver {
 
   @Mutation(() => User)
   async createUser(@Args() args: CreateUserArgs) {
-    const userId = await this.usersService.createUser(args);
-    return {
-      id: userId,
-      email: args.email,
-    };
+    const user = await this.usersService.createUser(args);
+    return user;
+  }
+
+  @Mutation(() => User)
+  async createSeller(@Args() args: CreateSellerArgs) {
+    const user = await this.usersService.createSeller(args);
+    return user;
   }
 
   @Query(() => User)

@@ -5,6 +5,7 @@ import { CreateUserArgs } from './dto/createUser.args';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { ValidateUserArgs } from './dto/validateUser.args';
+import { CreateSellerArgs } from './dto/createSeller.args';
 
 @Injectable()
 export class UsersService {
@@ -12,7 +13,28 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
-  async createUser(args: CreateUserArgs): Promise<number> {
+
+  // async validateNewUser(email: string, password: string): Promise<string> {
+  //   return new Promise(async (resolve, reject) => {
+  //     try {
+  //       const isEmailTaken = await this.usersRepository.findOne({
+  //         email: email,
+  //       });
+
+  //       if (isEmailTaken) {
+  //         throw new BadRequestException('User exists.');
+  //       }
+
+  //       const hash = await bcrypt.hash(password, 10);
+
+  //       resolve(hash);
+  //     } catch (e) {
+  //       reject();
+  //     }
+  //   });
+  // }
+
+  async createUser(args: CreateUserArgs): Promise<User> {
     const isEmailTaken = await this.usersRepository.findOne({
       email: args.email,
     });
@@ -30,10 +52,43 @@ export class UsersService {
       .values({
         email: args.email,
         password: hash,
+        isSeller: false,
       })
       .execute();
 
-    return result.raw[0].id;
+    return {
+      ...args,
+      ...result.raw[0],
+    };
+  }
+
+  async createSeller(args: CreateSellerArgs): Promise<User> {
+    const isEmailTaken = await this.usersRepository.findOne({
+      email: args.email,
+    });
+
+    if (isEmailTaken) {
+      throw new BadRequestException('User exists.');
+    }
+
+    const hash = await bcrypt.hash(args.password, 10);
+    const result = await this.usersRepository
+      .createQueryBuilder()
+      .insert()
+      .into(User)
+      .values({
+        email: args.email,
+        password: hash,
+        firstName: args.firstName,
+        lastName: args.lastName,
+        isSeller: true,
+      })
+      .execute();
+
+    return {
+      ...args,
+      ...result.raw[0],
+    };
   }
 
   async validateUser(args: ValidateUserArgs) {
@@ -54,9 +109,6 @@ export class UsersService {
       throw new BadRequestException('Wrong password.');
     }
 
-    return {
-      id: user.id,
-      email: user.email,
-    };
+    return user;
   }
 }
