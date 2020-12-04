@@ -2,13 +2,12 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
 import { PassportModule } from '@nestjs/passport';
-import { LocalStrategy } from './local.strategy';
+import { LocalStrategy } from './strategies/local.strategy';
+import { CookieSerializer } from './cookie.serializer';
 
 @Module({
-  imports: [
-    UsersModule,
-    PassportModule.register({ session: true, defaultStrategy: 'local' }),
-  ],
-  providers: [AuthService, LocalStrategy],
+  imports: [UsersModule, PassportModule.register({ session: true })],
+  providers: [AuthService, LocalStrategy, CookieSerializer],
+  exports: [AuthService],
 })
 export class AuthModule {}

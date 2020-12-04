@@ -1,6 +1,7 @@
 import { IsEmail, MinLength } from 'class-validator';
-import { Field, ArgsType } from '@nestjs/graphql';
+import { Field, ArgsType, ObjectType } from '@nestjs/graphql';
 
+@ObjectType()
 @ArgsType()
 export class ValidateUserArgs {
   @Field()

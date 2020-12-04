@@ -8,9 +8,10 @@ type User {
 }
 
 type Query {
-  me: String!
+  me: User!
 }
 
 type Mutation {
   createUser(email: String!, password: String!): User!
+  login(email: String!, password: String!): Boolean!
 }
