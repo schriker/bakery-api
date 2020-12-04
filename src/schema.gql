@@ -8,6 +8,7 @@ type User {
   firstName: String
   lastName: String
   isSeller: Boolean!
+  ingredients: [Ingredient!]
 }
 
 type Ingredient {
@@ -15,17 +16,18 @@ type Ingredient {
   name: String!
   price: Float!
   unit: String!
+  user: User!
 }
 
 type Query {
-  me: User!
   ingredients: [Ingredient!]!
+  me: User!
 }
 
 type Mutation {
+  createIngredient(name: String!, price: Float!, unit: String!): Ingredient!
   createUser(email: String!, password: String!): User!
   createSeller(email: String!, password: String!, firstName: String!, lastName: String!): User!
   login(email: String!, password: String!): Boolean!
   logout: Boolean!
-  createIngredient(name: String!, price: Float!, unit: String!): Ingredient!
 }

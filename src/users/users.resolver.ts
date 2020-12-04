@@ -1,7 +1,15 @@
-import { UseGuards } from '@nestjs/common';
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { forwardRef, Inject, UseGuards } from '@nestjs/common';
+import {
+  Args,
+  Context,
+  Mutation,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { GQLAuthGuard } from 'src/auth/guards/gql-local-auth.guard';
 import { GQLSessionGuard } from 'src/auth/guards/gql-session-auth.guard';
+import { IngredientsService } from 'src/ingredients/ingredients.service';
 import { CurrentUser } from './decorators/currentUser.decorator';
 import { CreateSellerArgs } from './dto/createSeller.args';
 import { CreateUserArgs } from './dto/createUser.args';
@@ -9,9 +17,13 @@ import { ValidateUserArgs } from './dto/validateUser.args';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
-@Resolver()
+@Resolver(() => User)
 export class UsersResolver {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    @Inject(forwardRef(() => IngredientsService))
+    private ingredientsService: IngredientsService,
+  ) {}
 
   @Mutation(() => User)
   createUser(@Args() args: CreateUserArgs) {
@@ -40,5 +52,11 @@ export class UsersResolver {
   logout(@Context() ctx) {
     ctx.req.logout();
     return true;
+  }
+
+  @ResolveField()
+  @UseGuards(GQLSessionGuard)
+  ingredients(@CurrentUser() user: User) {
+    return this.ingredientsService.findIngredients(user);
   }
 }

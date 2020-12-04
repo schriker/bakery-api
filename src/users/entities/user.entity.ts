@@ -1,5 +1,6 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Ingredient } from 'src/ingredients/entities/ingredient.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 @ObjectType()
@@ -26,4 +27,10 @@ export class User {
   @Field()
   @Column({ default: false })
   isSeller: boolean;
+
+  @Field(() => [Ingredient], { nullable: true })
+  @OneToMany(() => Ingredient, (ingredeint) => ingredeint.user, {
+    nullable: true,
+  })
+  ingredients: Ingredient[];
 }

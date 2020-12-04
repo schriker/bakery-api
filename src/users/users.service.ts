@@ -14,6 +14,10 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
+  findUserById(id: number) {
+    return this.usersRepository.find({ id: id });
+  }
+
   async createUser(args: CreateUserArgs): Promise<User> {
     const isEmailTaken = await this.usersRepository.findOne({
       email: args.email,
