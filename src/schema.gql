@@ -18,4 +18,5 @@ type Mutation {
   createUser(email: String!, password: String!): User!
   createSeller(email: String!, password: String!, firstName: String!, lastName: String!): User!
   login(email: String!, password: String!): Boolean!
+  logout: Boolean!
 }

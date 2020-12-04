@@ -14,26 +14,6 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  // async validateNewUser(email: string, password: string): Promise<string> {
-  //   return new Promise(async (resolve, reject) => {
-  //     try {
-  //       const isEmailTaken = await this.usersRepository.findOne({
-  //         email: email,
-  //       });
-
-  //       if (isEmailTaken) {
-  //         throw new BadRequestException('User exists.');
-  //       }
-
-  //       const hash = await bcrypt.hash(password, 10);
-
-  //       resolve(hash);
-  //     } catch (e) {
-  //       reject();
-  //     }
-  //   });
-  // }
-
   async createUser(args: CreateUserArgs): Promise<User> {
     const isEmailTaken = await this.usersRepository.findOne({
       email: args.email,

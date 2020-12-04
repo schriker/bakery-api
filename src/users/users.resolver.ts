@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { GQLAuthGuard } from 'src/auth/guards/gql-local-auth.guard';
 import { GQLSessionGuard } from 'src/auth/guards/gql-session-auth.guard';
 import { CurrentUser } from './currentUser.decorator';
@@ -35,6 +35,12 @@ export class UsersResolver {
   @UseGuards(GQLAuthGuard)
   /* eslint-disable @typescript-eslint/no-unused-vars */
   login(@Args() args: ValidateUserArgs) {
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  logout(@Context() ctx) {
+    ctx.req.logout();
     return true;
   }
 }
