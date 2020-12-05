@@ -37,8 +37,12 @@ export class UsersResolver {
 
   @Query(() => User)
   @UseGuards(GQLSessionGuard)
-  me(@CurrentUser() user: User) {
-    return user;
+  me(@CurrentUser() user: User): User {
+    return {
+      ...user,
+      createdAt: new Date(user.createdAt),
+      updatedAt: new Date(user.updatedAt),
+    };
   }
 
   @Mutation(() => Boolean)

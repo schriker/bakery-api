@@ -1,8 +1,16 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { User } from 'src/users/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from '../../users/entities/user.entity';
 
-@Entity()
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+
+@Entity('ingredient')
 @ObjectType()
 export class Ingredient {
   @PrimaryGeneratedColumn()
@@ -24,4 +32,12 @@ export class Ingredient {
   @Field(() => User)
   @ManyToOne(() => User, (user) => user.ingredients)
   user: User;
+
+  @Field()
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @Field()
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
