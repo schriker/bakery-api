@@ -1,9 +1,19 @@
-import { forwardRef, Inject, UseGuards } from '@nestjs/common';
-import { Args, Mutation, Resolver, Query, ResolveField } from '@nestjs/graphql';
+import {
+  ForbiddenException,
+  forwardRef,
+  Inject,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  Args,
+  Mutation,
+  Resolver,
+  Query,
+  ResolveField,
+  Int,
+} from '@nestjs/graphql';
 import { GQLSessionGuard } from 'src/auth/guards/gql-session-auth.guard';
-import { AppAbility } from 'src/casl/casl-ability.factory';
-import { CheckPolicies } from 'src/casl/decorators/check-policies.decorator';
-import { GQLPoliciesGuard } from 'src/casl/guards/gql-policies.guard';
+import { CaslAbilityFactory } from 'src/casl/casl-ability.factory';
 import { Action } from 'src/casl/types/casl.types';
 import { CurrentUser } from 'src/users/decorators/currentUser.decorator';
 import { User } from 'src/users/entities/user.entity';
@@ -18,6 +28,7 @@ export class IngredientsResolver {
     private ingredeintsService: IngredientsService,
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
+    private caslAbilityFactory: CaslAbilityFactory,
   ) {}
 
   @UseGuards(GQLSessionGuard)
@@ -32,15 +43,32 @@ export class IngredientsResolver {
     return ingredientUser;
   }
 
-  @UseGuards(GQLPoliciesGuard)
-  @CheckPolicies((ability: AppAbility) =>
-    ability.can(Action.Manage, Ingredient),
-  )
+  @UseGuards(GQLSessionGuard)
   @Mutation(() => Ingredient)
   createIngredient(
     @Args() args: CreateIngredientArgs,
     @CurrentUser() user: User,
   ) {
+    const ability = this.caslAbilityFactory.createForUser(user);
+    if (!ability.can(Action.Manage, Ingredient)) {
+      throw new ForbiddenException();
+    }
     return this.ingredeintsService.createIngredient(args, user);
+  }
+
+  @UseGuards(GQLSessionGuard)
+  @Mutation(() => Boolean)
+  async deleteIngredient(
+    @Args('id', { type: () => Int }) id: number,
+    @CurrentUser() user: User,
+  ) {
+    const ability = this.caslAbilityFactory.createForUser(user);
+    const ingredient = await this.ingredeintsService.findIngredientById(id);
+
+    if (!ability.can(Action.Manage, ingredient)) {
+      throw new ForbiddenException();
+    }
+
+    return true;
   }
 }

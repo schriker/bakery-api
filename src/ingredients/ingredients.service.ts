@@ -32,9 +32,22 @@ export class IngredientsService {
     };
   }
 
-  async findIngredients(user: User): Promise<Ingredient[]> {
+  findIngredients(user: User): Promise<Ingredient[]> {
     return this.ingredientRepository.find({
       user: user,
+    });
+  }
+
+  findIngredientById(id: number) {
+    return this.ingredientRepository.findOne({
+      where: { id: id },
+      relations: ['user'],
+    });
+  }
+
+  deleteIngredient(id: number) {
+    return this.ingredientRepository.delete({
+      id: id,
     });
   }
 }

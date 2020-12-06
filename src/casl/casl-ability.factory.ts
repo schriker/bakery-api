@@ -15,8 +15,10 @@ export class CaslAbilityFactory {
       Ability as AbilityClass<AppAbility>,
     );
 
+    console.log(user);
+
     if (user.isSeller) {
-      can(Action.Manage, Ingredient, { user: user });
+      can(Action.Manage, Ingredient, { 'user.id': user.id });
     }
 
     return build();
