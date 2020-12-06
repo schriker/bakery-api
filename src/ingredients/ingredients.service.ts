@@ -32,7 +32,6 @@ export class IngredientsService {
     };
   }
 
-  // Later Find By User ID
   async findIngredients(user: User): Promise<Ingredient[]> {
     return this.ingredientRepository.find({
       user: user,

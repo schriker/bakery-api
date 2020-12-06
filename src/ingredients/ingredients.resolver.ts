@@ -1,6 +1,10 @@
 import { forwardRef, Inject, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query, ResolveField } from '@nestjs/graphql';
 import { GQLSessionGuard } from 'src/auth/guards/gql-session-auth.guard';
+import { AppAbility } from 'src/casl/casl-ability.factory';
+import { CheckPolicies } from 'src/casl/decorators/check-policies.decorator';
+import { GQLPoliciesGuard } from 'src/casl/guards/gql-policies.guard';
+import { Action } from 'src/casl/types/casl.types';
 import { CurrentUser } from 'src/users/decorators/currentUser.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
@@ -15,7 +19,7 @@ export class IngredientsResolver {
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
   ) {}
-  // Later Find By User ID
+
   @UseGuards(GQLSessionGuard)
   @Query(() => [Ingredient])
   ingredients(@CurrentUser() user: User) {
@@ -28,7 +32,10 @@ export class IngredientsResolver {
     return ingredientUser;
   }
 
-  @UseGuards(GQLSessionGuard)
+  @UseGuards(GQLPoliciesGuard)
+  @CheckPolicies((ability: AppAbility) =>
+    ability.can(Action.Manage, Ingredient),
+  )
   @Mutation(() => Ingredient)
   createIngredient(
     @Args() args: CreateIngredientArgs,
