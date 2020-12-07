@@ -1,10 +1,12 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { ProductIngredient } from 'src/product-ingredients/entities/product-ingredient.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -43,5 +45,14 @@ export class Product {
   @Field(() => User)
   @ManyToOne(() => User, (user) => user.ingredients)
   user: User;
-  // ingredients:
+
+  @Field(() => [ProductIngredient], { nullable: true })
+  @OneToMany(
+    () => ProductIngredient,
+    (productIngredient) => productIngredient.product,
+    {
+      nullable: true,
+    },
+  )
+  productIngredients: ProductIngredient[];
 }

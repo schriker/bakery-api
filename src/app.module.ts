@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { IngredientsModule } from './ingredients/ingredients.module';
 import { CaslModule } from './casl/casl.module';
 import { ProductsModule } from './products/products.module';
+import { ProductIngredientsModule } from './product-ingredients/product-ingredients.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ProductsModule } from './products/products.module';
     IngredientsModule,
     CaslModule,
     ProductsModule,
+    ProductIngredientsModule,
   ],
 })
 export class AppModule {}

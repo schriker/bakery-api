@@ -6,9 +6,11 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { ProductIngredient } from 'src/product-ingredients/entities/product-ingredient.entity';
 
 @Entity('ingredient')
 @ObjectType()
@@ -32,6 +34,16 @@ export class Ingredient {
   @Field(() => User)
   @ManyToOne(() => User, (user) => user.ingredients)
   user: User;
+
+  @Field(() => [ProductIngredient], { nullable: true })
+  @OneToMany(
+    () => ProductIngredient,
+    (productIngredient) => productIngredient.ingredient,
+    {
+      nullable: true,
+    },
+  )
+  productIngredients: ProductIngredient[];
 
   @Field()
   @CreateDateColumn()

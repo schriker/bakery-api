@@ -2,6 +2,21 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type ProductIngredient {
+  id: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  count: Int!
+  user: User!
+  product: Product!
+  ingredient: Ingredient!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Product {
   id: Int!
   createdAt: DateTime!
@@ -11,12 +26,8 @@ type Product {
   count: Int!
   isPublished: Boolean!
   user: User!
+  productIngredients: [ProductIngredient!]
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type User {
   id: Int!
@@ -26,6 +37,7 @@ type User {
   isSeller: Boolean!
   ingredients: [Ingredient!]
   products: [Product!]
+  productIngredients: [ProductIngredient!]
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -36,6 +48,7 @@ type Ingredient {
   price: Float!
   unit: String!
   user: User!
+  productIngredients: [ProductIngredient!]
   createdAt: DateTime!
   updatedAt: DateTime!
 }

@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Product } from 'src/products/entities/product.entity';
+import { ProductIngredient } from 'src/product-ingredients/entities/product-ingredient.entity';
 
 @Entity('user')
 @ObjectType()
@@ -47,6 +48,16 @@ export class User {
     nullable: true,
   })
   products: Product[];
+
+  @Field(() => [ProductIngredient], { nullable: true })
+  @OneToMany(
+    () => ProductIngredient,
+    (productIngredient) => productIngredient.user,
+    {
+      nullable: true,
+    },
+  )
+  productIngredients: ProductIngredient[];
 
   @Field()
   @CreateDateColumn()
