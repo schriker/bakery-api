@@ -41,4 +41,11 @@ export class ProductsService {
       relations: ['user'],
     });
   }
+
+  findProductById(id: number) {
+    return this.productRepository.findOne({
+      where: { id: id },
+      relations: ['user'],
+    });
+  }
 }
