@@ -13,7 +13,7 @@ import {
   Int,
 } from '@nestjs/graphql';
 import { GQLSessionGuard } from 'src/auth/guards/gql-session-auth.guard';
-import { CaslAbilityFactory } from 'src/casl/casl-ability.factory';
+import { CaslIngredientAbilityFactory } from 'src/casl/casl-ingredient-ability.factory';
 import { Action } from 'src/casl/types/casl.types';
 import { CurrentUser } from 'src/users/decorators/currentUser.decorator';
 import { User } from 'src/users/entities/user.entity';
@@ -28,7 +28,7 @@ export class IngredientsResolver {
     private ingredeintsService: IngredientsService,
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
-    private caslAbilityFactory: CaslAbilityFactory,
+    private caslIngredientAbilityFactory: CaslIngredientAbilityFactory,
   ) {}
 
   @UseGuards(GQLSessionGuard)
@@ -49,7 +49,7 @@ export class IngredientsResolver {
     @Args() args: CreateIngredientArgs,
     @CurrentUser() user: User,
   ) {
-    const ability = this.caslAbilityFactory.createForUser(user);
+    const ability = this.caslIngredientAbilityFactory.createForUser(user);
     if (!ability.can(Action.Manage, Ingredient)) {
       throw new ForbiddenException();
     }
@@ -62,12 +62,14 @@ export class IngredientsResolver {
     @Args('id', { type: () => Int }) id: number,
     @CurrentUser() user: User,
   ) {
-    const ability = this.caslAbilityFactory.createForUser(user);
+    const ability = this.caslIngredientAbilityFactory.createForUser(user);
     const ingredient = await this.ingredeintsService.findIngredientById(id);
 
     if (!ability.can(Action.Manage, ingredient)) {
       throw new ForbiddenException();
     }
+
+    await this.ingredeintsService.deleteIngredient(id);
 
     return true;
   }

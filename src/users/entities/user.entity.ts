@@ -31,7 +31,7 @@ export class User {
   @Column({ nullable: true })
   lastName?: string;
 
-  @Field()
+  @Field({ defaultValue: false })
   @Column({ default: false })
   isSeller: boolean;
 

@@ -1,9 +1,15 @@
 {
-  "type": "pg",
-  "host": "localhost",
+  "type": "postgres",
+  "host": "127.0.0.1",
   "port": 32774,
   "username": "",
   "password": "",
   "database": "",
-  "entities": ["dist/**/*.entity{.ts,.js}"]
+  "entities": ["dist/**/*.entity{.ts,.js}"],
+  "migrationsTableName": "custom_migration_table",
+  "migrations": ["dist/migration/*{.ts,.js}"],
+  "cli": {
+      "migrationsDir": "migration"
+  },
+  "synchronize": false
 }

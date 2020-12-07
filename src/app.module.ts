@@ -7,6 +7,7 @@ import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { IngredientsModule } from './ingredients/ingredients.module';
 import { CaslModule } from './casl/casl.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { CaslModule } from './casl/casl.module';
     AuthModule,
     IngredientsModule,
     CaslModule,
+    ProductsModule,
   ],
 })
 export class AppModule {}

@@ -1,4 +1,4 @@
-import { AppAbility } from '../casl-ability.factory';
+import { AppAbility } from '../casl-ingredient-ability.factory';
 
 export enum Action {
   Manage = 'manage',

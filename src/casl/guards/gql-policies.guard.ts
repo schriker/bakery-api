@@ -4,7 +4,10 @@ import {
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CaslAbilityFactory, AppAbility } from '../casl-ability.factory';
+import {
+  CaslIngredientAbilityFactory,
+  AppAbility,
+} from '../casl-ingredient-ability.factory';
 import { PolicyHandler } from '../types/casl.types';
 import { CHECK_POLICIES_KEY } from '../decorators/check-policies.decorator';
 import { GqlExecutionContext } from '@nestjs/graphql';
@@ -14,7 +17,7 @@ import { Reflector } from '@nestjs/core';
 export class GQLPoliciesGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private caslAbilityFactory: CaslAbilityFactory,
+    private caslIngredientAbilityFactory: CaslIngredientAbilityFactory,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -33,7 +36,7 @@ export class GQLPoliciesGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    const ability = this.caslAbilityFactory.createForUser(user);
+    const ability = this.caslIngredientAbilityFactory.createForUser(user);
 
     return policyHandlers.every((handler) =>
       this.execPolicyHandler(handler, ability),
