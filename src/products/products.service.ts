@@ -31,21 +31,27 @@ export class ProductsService {
 
   getProducts(): Promise<Product[]> {
     return this.productRepository.find({
-      relations: ['user'],
+      relations: ['user', 'productIngredients'],
     });
   }
 
   findProductsByUser(user: User): Promise<Product[]> {
     return this.productRepository.find({
       where: { user: user },
-      relations: ['user'],
+      relations: ['user', 'productIngredients'],
     });
   }
 
   findProductById(id: number) {
     return this.productRepository.findOne({
       where: { id: id },
-      relations: ['user'],
+      relations: ['user', 'productIngredients'],
+    });
+  }
+
+  deleteProductById(id: number) {
+    return this.productRepository.delete({
+      id: id,
     });
   }
 }

@@ -69,7 +69,7 @@ export class IngredientsResolver {
       throw new ForbiddenException();
     }
 
-    await this.ingredeintsService.deleteIngredient(id);
+    await this.ingredeintsService.deleteIngredientById(id);
 
     return true;
   }

@@ -1,5 +1,11 @@
 import { ForbiddenException, UseGuards } from '@nestjs/common';
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Parent,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { GQLSessionGuard } from 'src/auth/guards/gql-session-auth.guard';
 import { CaslIngredientAbilityFactory } from 'src/casl/casl-ingredient-ability.factory';
 import { CaslProductAbilityFactory } from 'src/casl/casl-product-ability.factory';
@@ -57,5 +63,29 @@ export class ProductIngredientsResolver {
       product,
       ingredient,
     );
+  }
+
+  @ResolveField()
+  async ingredient(@Parent() parent: ProductIngredient) {
+    const result = await this.productIngredientsService.findProductIngredientById(
+      parent.id,
+    );
+    return result.ingredient;
+  }
+
+  @ResolveField()
+  async user(@Parent() parent: ProductIngredient) {
+    const result = await this.productIngredientsService.findProductIngredientById(
+      parent.id,
+    );
+    return result.user;
+  }
+
+  @ResolveField()
+  async product(@Parent() parent: ProductIngredient) {
+    const result = await this.productIngredientsService.findProductIngredientById(
+      parent.id,
+    );
+    return result.product;
   }
 }

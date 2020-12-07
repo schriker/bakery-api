@@ -31,14 +31,20 @@ export class ProductIngredient {
   count: number;
 
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.productIngredients)
+  @ManyToOne(() => User, (user) => user.productIngredients, {
+    onDelete: 'CASCADE',
+  })
   user: User;
 
   @Field(() => Product)
-  @ManyToOne(() => Product, (product) => product.productIngredients)
+  @ManyToOne(() => Product, (product) => product.productIngredients, {
+    onDelete: 'CASCADE',
+  })
   product: Product;
 
   @Field(() => Ingredient)
-  @ManyToOne(() => Ingredient, (ingredient) => ingredient.productIngredients)
+  @ManyToOne(() => Ingredient, (ingredient) => ingredient.productIngredients, {
+    onDelete: 'CASCADE',
+  })
   ingredient: Ingredient;
 }

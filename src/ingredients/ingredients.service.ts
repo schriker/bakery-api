@@ -41,11 +41,11 @@ export class IngredientsService {
   findIngredientById(id: number) {
     return this.ingredientRepository.findOne({
       where: { id: id },
-      relations: ['user'],
+      relations: ['user', 'productIngredients'],
     });
   }
 
-  deleteIngredient(id: number) {
+  deleteIngredientById(id: number) {
     return this.ingredientRepository.delete({
       id: id,
     });

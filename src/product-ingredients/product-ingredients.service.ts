@@ -11,7 +11,7 @@ import { CreateProductIngredientArgs } from './gto/createProductIngredient.args'
 export class ProductIngredientsService {
   constructor(
     @InjectRepository(ProductIngredient)
-    private ingredientRepository: Repository<ProductIngredient>,
+    private productIngredientRepository: Repository<ProductIngredient>,
   ) {}
 
   async createProductIngredient(
@@ -20,7 +20,7 @@ export class ProductIngredientsService {
     product: Product,
     ingredient: Ingredient,
   ): Promise<ProductIngredient> {
-    const result = await this.ingredientRepository
+    const result = await this.productIngredientRepository
       .createQueryBuilder()
       .insert()
       .into(ProductIngredient)
@@ -38,5 +38,12 @@ export class ProductIngredientsService {
       product: product,
       ...result.raw[0],
     };
+  }
+
+  findProductIngredientById(id: number) {
+    return this.productIngredientRepository.findOne({
+      where: { id: id },
+      relations: ['user', 'product', 'ingredient'],
+    });
   }
 }

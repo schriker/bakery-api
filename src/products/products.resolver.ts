@@ -1,5 +1,5 @@
 import { ForbiddenException, UseGuards } from '@nestjs/common';
-import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
+import { Args, Mutation, Resolver, Query, Int } from '@nestjs/graphql';
 import { GQLSessionGuard } from 'src/auth/guards/gql-session-auth.guard';
 import { CaslProductAbilityFactory } from 'src/casl/casl-product-ability.factory';
 import { Action } from 'src/casl/types/casl.types';
@@ -31,5 +31,23 @@ export class ProductsResolver {
   @Query(() => [Product])
   products() {
     return this.productsService.getProducts();
+  }
+
+  @UseGuards(GQLSessionGuard)
+  @Mutation(() => Boolean)
+  async deleteProduct(
+    @Args('id', { type: () => Int }) id: number,
+    @CurrentUser() user: User,
+  ) {
+    const ability = this.caslProductAbilityFactory.createForUser(user);
+    const product = await this.productsService.findProductById(id);
+
+    if (!ability.can(Action.Manage, product)) {
+      throw new ForbiddenException();
+    }
+
+    await this.productsService.deleteProductById(id);
+
+    return true;
   }
 }

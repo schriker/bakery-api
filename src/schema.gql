@@ -63,6 +63,7 @@ type Mutation {
   createIngredient(name: String!, price: Float!, unit: String!): Ingredient!
   deleteIngredient(id: Int!): Boolean!
   createProduct(name: String!, price: Float!, count: Float!, isPublished: Boolean = false): Product!
+  deleteProduct(id: Int!): Boolean!
   createUser(email: String!, password: String!): User!
   createSeller(email: String!, password: String!, firstName: String!, lastName: String!): User!
   login(email: String!, password: String!): Boolean!
