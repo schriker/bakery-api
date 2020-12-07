@@ -1,5 +1,5 @@
 import { ForbiddenException, UseGuards } from '@nestjs/common';
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
 import { GQLSessionGuard } from 'src/auth/guards/gql-session-auth.guard';
 import { CaslProductAbilityFactory } from 'src/casl/casl-product-ability.factory copy';
 import { Action } from 'src/casl/types/casl.types';
@@ -25,6 +25,11 @@ export class ProductsResolver {
       throw new ForbiddenException();
     }
 
-    return this.productsService.createProduct(args);
+    return this.productsService.createProduct(args, user);
+  }
+
+  @Query(() => [Product])
+  products() {
+    return this.productsService.getProducts();
   }
 }

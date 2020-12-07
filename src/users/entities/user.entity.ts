@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Product } from 'src/products/entities/product.entity';
 
 @Entity('user')
 @ObjectType()
@@ -40,6 +41,12 @@ export class User {
     nullable: true,
   })
   ingredients: Ingredient[];
+
+  @Field(() => [Product], { nullable: true })
+  @OneToMany(() => Product, (product) => product.user, {
+    nullable: true,
+  })
+  products: Product[];
 
   @Field()
   @CreateDateColumn()

@@ -32,7 +32,7 @@ export class IngredientsService {
     };
   }
 
-  findIngredients(user: User): Promise<Ingredient[]> {
+  findIngredientsByUser(user: User): Promise<Ingredient[]> {
     return this.ingredientRepository.find({
       user: user,
     });

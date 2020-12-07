@@ -1,8 +1,10 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -38,6 +40,8 @@ export class Product {
   @Column({ default: false })
   isPublished: boolean;
 
-  // author:
+  @Field(() => User)
+  @ManyToOne(() => User, (user) => user.ingredients)
+  user: User;
   // ingredients:
 }

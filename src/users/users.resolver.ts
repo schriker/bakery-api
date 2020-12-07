@@ -10,6 +10,7 @@ import {
 import { GQLAuthGuard } from 'src/auth/guards/gql-local-auth.guard';
 import { GQLSessionGuard } from 'src/auth/guards/gql-session-auth.guard';
 import { IngredientsService } from 'src/ingredients/ingredients.service';
+import { ProductsService } from 'src/products/products.service';
 import { CurrentUser } from './decorators/currentUser.decorator';
 import { CreateSellerArgs } from './dto/createSeller.args';
 import { CreateUserArgs } from './dto/createUser.args';
@@ -23,6 +24,8 @@ export class UsersResolver {
     private usersService: UsersService,
     @Inject(forwardRef(() => IngredientsService))
     private ingredientsService: IngredientsService,
+    @Inject(forwardRef(() => ProductsService))
+    private productsService: ProductsService,
   ) {}
 
   @Mutation(() => User)
@@ -61,6 +64,12 @@ export class UsersResolver {
   @ResolveField()
   @UseGuards(GQLSessionGuard)
   ingredients(@CurrentUser() user: User) {
-    return this.ingredientsService.findIngredients(user);
+    return this.ingredientsService.findIngredientsByUser(user);
+  }
+
+  @ResolveField()
+  @UseGuards(GQLSessionGuard)
+  products(@CurrentUser() user: User) {
+    return this.productsService.findProductsByUser(user);
   }
 }

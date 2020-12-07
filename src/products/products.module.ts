@@ -6,6 +6,7 @@ import { ProductsResolver } from './products.resolver';
 import { ProductsService } from './products.service';
 
 @Module({
+  exports: [ProductsService],
   imports: [TypeOrmModule.forFeature([Product]), CaslModule],
   providers: [ProductsResolver, ProductsService],
 })

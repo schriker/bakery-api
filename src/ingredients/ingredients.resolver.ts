@@ -34,7 +34,7 @@ export class IngredientsResolver {
   @UseGuards(GQLSessionGuard)
   @Query(() => [Ingredient])
   ingredients(@CurrentUser() user: User) {
-    return this.ingredeintsService.findIngredients(user);
+    return this.ingredeintsService.findIngredientsByUser(user);
   }
 
   @ResolveField(() => User)
