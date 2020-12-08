@@ -54,4 +54,8 @@ export class IngredientsService {
   deleteIngredientsById(id: number[]) {
     return this.ingredientRepository.delete(id);
   }
+
+  updateIngredient(ingredient: Ingredient) {
+    return this.ingredientRepository.save(ingredient);
+  }
 }

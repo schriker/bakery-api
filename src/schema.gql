@@ -61,13 +61,16 @@ type Query {
 
 type Mutation {
   createIngredient(name: String!, price: Float!, unit: String!): Ingredient!
+  updateIngredient(name: String!, price: Float!, unit: String!, id: Int!): Ingredient!
   deleteIngredient(id: [Int!]!): Boolean!
   createProduct(name: String!, price: Float!, count: Float!, isPublished: Boolean = false): Product!
+  updateProduct(name: String!, price: Float!, count: Float!, isPublished: Boolean = false, id: Int!): Product!
   deleteProduct(id: [Int!]!): Boolean!
   createUser(email: String!, password: String!): User!
   createSeller(email: String!, password: String!, firstName: String!, lastName: String!): User!
   login(email: String!, password: String!): Boolean!
   logout: Boolean!
   createProductIngredient(count: Float!, product: Float!, ingredient: Float!): ProductIngredient!
+  updateProductIngredient(count: Float!, product: Float!, ingredient: Float!, id: Int!): ProductIngredient!
   deleteProductIngredient(id: [Int!]!): Boolean!
 }

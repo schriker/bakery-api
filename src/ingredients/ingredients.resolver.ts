@@ -31,6 +31,26 @@ export class IngredientsResolver {
     private caslIngredientAbilityFactory: CaslIngredientAbilityFactory,
   ) {}
 
+  checkAbility(
+    action: Action,
+    user: User,
+    ingredient: Ingredient | Ingredient[] | typeof Ingredient,
+  ) {
+    const ability = this.caslIngredientAbilityFactory.createForUser(user);
+
+    if (Array.isArray(ingredient)) {
+      ingredient.forEach((ingredient) => {
+        if (!ability.can(Action.Manage, ingredient)) {
+          throw new ForbiddenException();
+        }
+      });
+    } else {
+      if (!ability.can(action, ingredient)) {
+        throw new ForbiddenException();
+      }
+    }
+  }
+
   @UseGuards(GQLSessionGuard)
   @Query(() => [Ingredient])
   ingredients(@CurrentUser() user: User) {
@@ -49,11 +69,26 @@ export class IngredientsResolver {
     @Args() args: CreateIngredientArgs,
     @CurrentUser() user: User,
   ) {
-    const ability = this.caslIngredientAbilityFactory.createForUser(user);
-    if (!ability.can(Action.Manage, Ingredient)) {
-      throw new ForbiddenException();
-    }
+    this.checkAbility(Action.Manage, user, Ingredient);
+
     return this.ingredeintsService.createIngredient(args, user);
+  }
+
+  @UseGuards(GQLSessionGuard)
+  @Mutation(() => Ingredient)
+  async updateIngredient(
+    @Args('id', { type: () => Int }) id: number,
+    @Args() args: CreateIngredientArgs,
+    @CurrentUser() user: User,
+  ) {
+    const ingredient = await this.ingredeintsService.findIngredientById(id);
+
+    this.checkAbility(Action.Manage, user, ingredient);
+
+    return this.ingredeintsService.updateIngredient({
+      ...ingredient,
+      ...args,
+    });
   }
 
   @UseGuards(GQLSessionGuard)
@@ -62,14 +97,8 @@ export class IngredientsResolver {
     @Args('id', { type: () => [Int] }) id: number[],
     @CurrentUser() user: User,
   ) {
-    const ability = this.caslIngredientAbilityFactory.createForUser(user);
     const ingredients = await this.ingredeintsService.findIngredientsById(id);
-
-    ingredients.forEach((ingredient) => {
-      if (!ability.can(Action.Manage, ingredient)) {
-        throw new ForbiddenException();
-      }
-    });
+    this.checkAbility(Action.Manage, user, ingredients);
 
     await this.ingredeintsService.deleteIngredientsById(id);
 

@@ -16,14 +16,30 @@ export class ProductsResolver {
     private productsService: ProductsService,
   ) {}
 
+  checkAbility(
+    action: Action,
+    user: User,
+    product: Product | Product[] | typeof Product,
+  ) {
+    const ability = this.caslProductAbilityFactory.createForUser(user);
+
+    if (Array.isArray(product)) {
+      product.forEach((product) => {
+        if (!ability.can(Action.Manage, product)) {
+          throw new ForbiddenException();
+        }
+      });
+    } else {
+      if (!ability.can(action, product)) {
+        throw new ForbiddenException();
+      }
+    }
+  }
+
   @UseGuards(GQLSessionGuard)
   @Mutation(() => Product)
   createProduct(@Args() args: CreateProductArgs, @CurrentUser() user: User) {
-    const ability = this.caslProductAbilityFactory.createForUser(user);
-
-    if (!ability.can(Action.Manage, Product)) {
-      throw new ForbiddenException();
-    }
+    this.checkAbility(Action.Manage, user, Product);
 
     return this.productsService.createProduct(args, user);
   }
@@ -33,9 +49,22 @@ export class ProductsResolver {
     return this.productsService.getProducts();
   }
 
-  // @UseGuards(GQLSessionGuard)
-  // @Mutation(() => Product)
-  // async updateProduct
+  @UseGuards(GQLSessionGuard)
+  @Mutation(() => Product)
+  async updateProduct(
+    @Args('id', { type: () => Int }) id: number,
+    @Args() args: CreateProductArgs,
+    @CurrentUser() user: User,
+  ) {
+    const product = await this.productsService.findProductById(id);
+
+    this.checkAbility(Action.Manage, user, product);
+
+    return this.productsService.updateProduct({
+      ...product,
+      ...args,
+    });
+  }
 
   @UseGuards(GQLSessionGuard)
   @Mutation(() => Boolean)
@@ -43,14 +72,9 @@ export class ProductsResolver {
     @Args('id', { type: () => [Int] }) id: number[],
     @CurrentUser() user: User,
   ) {
-    const ability = this.caslProductAbilityFactory.createForUser(user);
     const products = await this.productsService.findProductsById(id);
 
-    products.forEach((product) => {
-      if (!ability.can(Action.Manage, product)) {
-        throw new ForbiddenException();
-      }
-    });
+    this.checkAbility(Action.Manage, user, products);
 
     await this.productsService.deleteProductsById(id);
 

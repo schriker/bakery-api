@@ -58,4 +58,8 @@ export class ProductsService {
   deleteProductsById(id: number[]) {
     return this.productRepository.delete(id);
   }
+
+  updateProduct(product: Product) {
+    return this.productRepository.save(product);
+  }
 }
