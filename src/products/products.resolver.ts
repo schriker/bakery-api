@@ -33,20 +33,26 @@ export class ProductsResolver {
     return this.productsService.getProducts();
   }
 
+  // @UseGuards(GQLSessionGuard)
+  // @Mutation(() => Product)
+  // async updateProduct
+
   @UseGuards(GQLSessionGuard)
   @Mutation(() => Boolean)
   async deleteProduct(
-    @Args('id', { type: () => Int }) id: number,
+    @Args('id', { type: () => [Int] }) id: number[],
     @CurrentUser() user: User,
   ) {
     const ability = this.caslProductAbilityFactory.createForUser(user);
-    const product = await this.productsService.findProductById(id);
+    const products = await this.productsService.findProductsById(id);
 
-    if (!ability.can(Action.Manage, product)) {
-      throw new ForbiddenException();
-    }
+    products.forEach((product) => {
+      if (!ability.can(Action.Manage, product)) {
+        throw new ForbiddenException();
+      }
+    });
 
-    await this.productsService.deleteProductById(id);
+    await this.productsService.deleteProductsById(id);
 
     return true;
   }

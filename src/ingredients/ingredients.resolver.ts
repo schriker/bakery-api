@@ -59,17 +59,19 @@ export class IngredientsResolver {
   @UseGuards(GQLSessionGuard)
   @Mutation(() => Boolean)
   async deleteIngredient(
-    @Args('id', { type: () => Int }) id: number,
+    @Args('id', { type: () => [Int] }) id: number[],
     @CurrentUser() user: User,
   ) {
     const ability = this.caslIngredientAbilityFactory.createForUser(user);
-    const ingredient = await this.ingredeintsService.findIngredientById(id);
+    const ingredients = await this.ingredeintsService.findIngredientsById(id);
 
-    if (!ability.can(Action.Manage, ingredient)) {
-      throw new ForbiddenException();
-    }
+    ingredients.forEach((ingredient) => {
+      if (!ability.can(Action.Manage, ingredient)) {
+        throw new ForbiddenException();
+      }
+    });
 
-    await this.ingredeintsService.deleteIngredientById(id);
+    await this.ingredeintsService.deleteIngredientsById(id);
 
     return true;
   }

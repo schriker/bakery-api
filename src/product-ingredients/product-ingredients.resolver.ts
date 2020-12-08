@@ -1,6 +1,7 @@
 import { ForbiddenException, UseGuards } from '@nestjs/common';
 import {
   Args,
+  Int,
   Mutation,
   Parent,
   ResolveField,
@@ -22,9 +23,9 @@ import { ProductIngredientsService } from './product-ingredients.service';
 @Resolver(() => ProductIngredient)
 export class ProductIngredientsResolver {
   constructor(
-    private castProductIngredientAbilityFactory: CaslProductIngredientAbilityFactory,
-    private castProductAbilityFactory: CaslProductAbilityFactory,
-    private castIngredientAbilityFactory: CaslIngredientAbilityFactory,
+    private caslProductIngredientAbilityFactory: CaslProductIngredientAbilityFactory,
+    private caslProductAbilityFactory: CaslProductAbilityFactory,
+    private caslIngredientAbilityFactory: CaslIngredientAbilityFactory,
     private productsService: ProductsService,
     private ingredientsService: IngredientsService,
     private productIngredientsService: ProductIngredientsService,
@@ -41,11 +42,11 @@ export class ProductIngredientsResolver {
       args.ingredient,
     );
 
-    const productAbility = this.castProductAbilityFactory.createForUser(user);
-    const ingredientAbility = this.castIngredientAbilityFactory.createForUser(
+    const productAbility = this.caslProductAbilityFactory.createForUser(user);
+    const ingredientAbility = this.caslIngredientAbilityFactory.createForUser(
       user,
     );
-    const productIngredientAbility = this.castProductIngredientAbilityFactory.createForUser(
+    const productIngredientAbility = this.caslProductIngredientAbilityFactory.createForUser(
       user,
     );
 
@@ -63,6 +64,30 @@ export class ProductIngredientsResolver {
       product,
       ingredient,
     );
+  }
+
+  @UseGuards(GQLSessionGuard)
+  @Mutation(() => Boolean)
+  async deleteProductIngredient(
+    @Args('id', { type: () => [Int] }) id: number[],
+    @CurrentUser() user: User,
+  ) {
+    const ability = this.caslProductIngredientAbilityFactory.createForUser(
+      user,
+    );
+    const productIngredeints = await this.productIngredientsService.findProductIngredientsById(
+      id,
+    );
+
+    productIngredeints.forEach((productIngredeint) => {
+      if (!ability.can(Action.Manage, productIngredeint)) {
+        throw new ForbiddenException();
+      }
+    });
+
+    await this.productIngredientsService.deleteProductIngredientsById(id);
+
+    return true;
   }
 
   @ResolveField()

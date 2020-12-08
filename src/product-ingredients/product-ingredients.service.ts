@@ -46,4 +46,14 @@ export class ProductIngredientsService {
       relations: ['user', 'product', 'ingredient'],
     });
   }
+
+  findProductIngredientsById(id: number[]) {
+    return this.productIngredientRepository.findByIds(id, {
+      relations: ['user', 'product', 'ingredient'],
+    });
+  }
+
+  deleteProductIngredientsById(id: number[]) {
+    return this.productIngredientRepository.delete(id);
+  }
 }

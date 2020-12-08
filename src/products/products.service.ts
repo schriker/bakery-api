@@ -49,9 +49,13 @@ export class ProductsService {
     });
   }
 
-  deleteProductById(id: number) {
-    return this.productRepository.delete({
-      id: id,
+  findProductsById(id: number[]) {
+    return this.productRepository.findByIds(id, {
+      relations: ['user', 'productIngredients'],
     });
+  }
+
+  deleteProductsById(id: number[]) {
+    return this.productRepository.delete(id);
   }
 }
