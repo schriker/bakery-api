@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import * as depthLimit from 'graphql-depth-limit';
 import { GraphQLModule } from '@nestjs/graphql';
 import { UsersModule } from './users/users.module';
 import { join } from 'path';
@@ -22,6 +23,7 @@ import { ProductIngredientsModule } from './product-ingredients/product-ingredie
           'request.credentials': 'include',
         },
       },
+      validationRules: [depthLimit(4)],
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
     UsersModule,
