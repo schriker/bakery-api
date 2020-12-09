@@ -53,6 +53,17 @@ type Ingredient {
   updatedAt: DateTime!
 }
 
+type City {
+  id: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  name: String!
+  district: String!
+  voivodeship: String!
+  latitude: Float!
+  longitude: Float!
+}
+
 type Query {
   ingredients: [Ingredient!]!
   products: [Product!]!
@@ -73,4 +84,5 @@ type Mutation {
   createProductIngredient(count: Float!, product: Float!, ingredient: Float!): ProductIngredient!
   updateProductIngredient(count: Float!, product: Float!, ingredient: Float!, id: Int!): ProductIngredient!
   deleteProductIngredient(id: [Int!]!): Boolean!
+  searchCity(query: String!): [City!]!
 }

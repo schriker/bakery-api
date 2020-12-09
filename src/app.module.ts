@@ -10,6 +10,7 @@ import { IngredientsModule } from './ingredients/ingredients.module';
 import { CaslModule } from './casl/casl.module';
 import { ProductsModule } from './products/products.module';
 import { ProductIngredientsModule } from './product-ingredients/product-ingredients.module';
+import { CitiesModule } from './cities/cities.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ProductIngredientsModule } from './product-ingredients/product-ingredie
     CaslModule,
     ProductsModule,
     ProductIngredientsModule,
+    CitiesModule,
   ],
 })
 export class AppModule {}

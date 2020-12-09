@@ -1,6 +1,7 @@
 .*env*
-ormconfig.json
+ormconfig*.json
 pdata
+psg_setup_data
 # compiled output
 /dist
 /node_modules
