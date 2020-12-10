@@ -59,7 +59,7 @@ export class IngredientsResolver {
 
   @ResolveField(() => User)
   async user(@CurrentUser() user: User) {
-    const [ingredientUser] = await this.usersService.findUserById(user.id);
+    const ingredientUser = await this.usersService.findUserById(user.id);
     return ingredientUser;
   }
 

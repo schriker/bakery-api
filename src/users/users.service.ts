@@ -6,16 +6,18 @@ import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { ValidateUserArgs } from './dto/validateUser.args';
 import { CreateSellerArgs } from './dto/createSeller.args';
+import { CitiesService } from 'src/cities/cities.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private citiesService: CitiesService,
   ) {}
 
   findUserById(id: number) {
-    return this.usersRepository.find({ id: id });
+    return this.usersRepository.findOne(id, { relations: ['city'] });
   }
 
   async createUser(args: CreateUserArgs): Promise<User> {
@@ -47,6 +49,7 @@ export class UsersService {
   }
 
   async createSeller(args: CreateSellerArgs): Promise<User> {
+    const city = await this.citiesService.findCityById(args.city);
     const isEmailTaken = await this.usersRepository.findOne({
       email: args.email,
     });
@@ -66,6 +69,7 @@ export class UsersService {
         firstName: args.firstName,
         lastName: args.lastName,
         isSeller: true,
+        city: city,
       })
       .execute();
 

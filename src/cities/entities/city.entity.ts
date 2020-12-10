@@ -1,10 +1,12 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { User } from 'src/users/entities/user.entity';
 import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
   Column,
   Entity,
+  OneToMany,
 } from 'typeorm';
 
 @Entity('city')
@@ -44,4 +46,9 @@ export class City {
 
   @Column('tsvector', { select: false })
   document_with_weights: any;
+
+  @OneToMany(() => User, (user) => user.city, {
+    nullable: true,
+  })
+  users: User[];
 }

@@ -15,10 +15,14 @@ export class CitiesService {
       SELECT *
       FROM city, to_tsquery($1) AS q
       WHERE (document_with_weights @@ q)
-    ) AS t1 ORDER BY ts_rank_cd(t1.document_with_weights, to_tsquery($1)) DESC;`,
-      [`${query.trim().split(' ').join('<->')}:*`],
+    ) AS t1 ORDER BY ts_rank(t1.document_with_weights, to_tsquery($1)) DESC LIMIT 10;`,
+      [`${query.trim().split(' ').join(' | ')}:*`],
     );
 
     return result;
+  }
+
+  findCityById(id: number) {
+    return this.cityRepository.findOne(id);
   }
 }

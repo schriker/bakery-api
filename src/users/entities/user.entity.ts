@@ -4,12 +4,14 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Product } from 'src/products/entities/product.entity';
 import { ProductIngredient } from 'src/product-ingredients/entities/product-ingredient.entity';
+import { City } from 'src/cities/entities/city.entity';
 
 @Entity('user')
 @ObjectType()
@@ -58,6 +60,12 @@ export class User {
     },
   )
   productIngredients: ProductIngredient[];
+
+  @Field(() => City, { nullable: true })
+  @ManyToOne(() => City, (city) => city.users, {
+    nullable: true,
+  })
+  city: City;
 
   @Field()
   @CreateDateColumn()

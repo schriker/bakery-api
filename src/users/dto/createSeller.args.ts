@@ -1,4 +1,4 @@
-import { IsEmail, MinLength } from 'class-validator';
+import { IsEmail, IsInt, IsPositive, MinLength } from 'class-validator';
 import { Field, ArgsType } from '@nestjs/graphql';
 
 @ArgsType()
@@ -18,4 +18,9 @@ export class CreateSellerArgs {
   @Field()
   @MinLength(2)
   lastName: string;
+
+  @Field()
+  @IsInt()
+  @IsPositive()
+  city: number;
 }

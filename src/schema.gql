@@ -2,21 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type ProductIngredient {
-  id: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  count: Int!
-  user: User!
-  product: Product!
-  ingredient: Ingredient!
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
 type Product {
   id: Int!
   createdAt: DateTime!
@@ -29,17 +14,19 @@ type Product {
   productIngredients: [ProductIngredient!]
 }
 
-type User {
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type ProductIngredient {
   id: Int!
-  email: String!
-  firstName: String
-  lastName: String
-  isSeller: Boolean!
-  ingredients: [Ingredient!]
-  products: [Product!]
-  productIngredients: [ProductIngredient!]
   createdAt: DateTime!
   updatedAt: DateTime!
+  count: Int!
+  user: User!
+  product: Product!
+  ingredient: Ingredient!
 }
 
 type Ingredient {
@@ -49,6 +36,20 @@ type Ingredient {
   unit: String!
   user: User!
   productIngredients: [ProductIngredient!]
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type User {
+  id: Int!
+  email: String!
+  firstName: String
+  lastName: String
+  isSeller: Boolean!
+  ingredients: [Ingredient!]
+  products: [Product!]
+  productIngredients: [ProductIngredient!]
+  city: City
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -71,6 +72,7 @@ type Query {
 }
 
 type Mutation {
+  searchCity(query: String!): [City!]!
   createIngredient(name: String!, price: Float!, unit: String!): Ingredient!
   updateIngredient(name: String!, price: Float!, unit: String!, id: Int!): Ingredient!
   deleteIngredient(id: [Int!]!): Boolean!
@@ -78,11 +80,10 @@ type Mutation {
   updateProduct(name: String!, price: Float!, count: Float!, isPublished: Boolean = false, id: Int!): Product!
   deleteProduct(id: [Int!]!): Boolean!
   createUser(email: String!, password: String!): User!
-  createSeller(email: String!, password: String!, firstName: String!, lastName: String!): User!
+  createSeller(email: String!, password: String!, firstName: String!, lastName: String!, city: Float!): User!
   login(email: String!, password: String!): Boolean!
   logout: Boolean!
   createProductIngredient(count: Float!, product: Float!, ingredient: Float!): ProductIngredient!
   updateProductIngredient(count: Float!, product: Float!, ingredient: Float!, id: Int!): ProductIngredient!
   deleteProductIngredient(id: [Int!]!): Boolean!
-  searchCity(query: String!): [City!]!
 }

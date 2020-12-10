@@ -72,4 +72,11 @@ export class UsersResolver {
   products(@CurrentUser() user: User) {
     return this.productsService.findProductsByUser(user);
   }
+
+  @ResolveField()
+  @UseGuards(GQLSessionGuard)
+  async city(@CurrentUser() user: User) {
+    const { city } = await this.usersService.findUserById(user.id);
+    return city;
+  }
 }

@@ -1,5 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CitiesModule } from 'src/cities/cities.module';
 import { IngredientsModule } from 'src/ingredients/ingredients.module';
 import { ProductsModule } from 'src/products/products.module';
 import { User } from './entities/user.entity';
@@ -11,6 +12,7 @@ import { UsersService } from './users.service';
     forwardRef(() => IngredientsModule),
     forwardRef(() => ProductsModule),
     TypeOrmModule.forFeature([User]),
+    CitiesModule,
   ],
   providers: [UsersResolver, UsersService],
   exports: [UsersService],
