@@ -43,6 +43,18 @@ export class Product {
   @Column({ default: false })
   isPublished: boolean;
 
+  @Field({ defaultValue: false })
+  @Column({ default: false })
+  delivery: boolean;
+
+  @Field({ defaultValue: false })
+  @Column({ default: false })
+  shipping: boolean;
+
+  @Field({ defaultValue: false })
+  @Column({ default: false })
+  pickup: boolean;
+
   @Field(() => User)
   @ManyToOne(() => User, (user) => user.ingredients)
   user: User;

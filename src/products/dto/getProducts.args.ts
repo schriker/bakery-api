@@ -8,8 +8,8 @@ import {
 import { IsPositive, Max, IsInt, Min, IsOptional } from 'class-validator';
 
 export enum OrderEnum {
-  'ASC',
-  'DESC',
+  ASC = 'ASC',
+  DESC = 'DESC',
 }
 
 registerEnumType(OrderEnum, {
@@ -23,6 +23,9 @@ class ProductsOrderType {
 
   @Field(() => OrderEnum, { nullable: true })
   price?: OrderEnum;
+
+  @Field(() => OrderEnum, { nullable: true })
+  isPublished?: OrderEnum;
 }
 
 @InputType()
@@ -36,14 +39,14 @@ class ProductsFilterType {
 
 @ArgsType()
 export class GetProductsArgs {
-  @Field()
+  @Field(() => Int)
   @IsInt()
   @IsPositive()
   @Max(50)
   @Min(5)
   limit: number;
 
-  @Field({ defaultValue: 0 })
+  @Field(() => Int, { defaultValue: 0 })
   @IsOptional()
   @IsInt()
   @Min(0)

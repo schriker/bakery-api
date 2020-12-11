@@ -1,11 +1,11 @@
 import { ArgsType, Field } from '@nestjs/graphql';
 import {
-  MinLength,
-  IsPositive,
-  IsNumber,
-  Max,
   IsBoolean,
   IsInt,
+  IsNumber,
+  IsPositive,
+  Max,
+  MinLength,
 } from 'class-validator';
 
 @ArgsType()
@@ -29,4 +29,16 @@ export class CreateProductArgs {
   @Field({ defaultValue: false })
   @IsBoolean()
   isPublished: boolean;
+
+  @Field({ defaultValue: false })
+  @IsBoolean()
+  delivery: boolean;
+
+  @Field({ defaultValue: false })
+  @IsBoolean()
+  shipping: boolean;
+
+  @Field({ defaultValue: false })
+  @IsBoolean()
+  pickup: boolean;
 }

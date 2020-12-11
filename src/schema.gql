@@ -47,6 +47,9 @@ type Product {
   price: Float!
   count: Int!
   isPublished: Boolean!
+  delivery: Boolean!
+  shipping: Boolean!
+  pickup: Boolean!
   user: User!
   city: City!
   productIngredients: [ProductIngredient!]
@@ -66,8 +69,8 @@ type City {
 type Query {
   me: User!
   ingredients: [Ingredient!]!
-  products(limit: Float!, currentPage: Float = 0, filter: ProductsFilterType, order: ProductsOrderType): [Product!]!
-  getUserProducts(limit: Float!, currentPage: Float = 0, filter: ProductsFilterType, order: ProductsOrderType): [Product!]!
+  products(limit: Int!, currentPage: Int = 0, filter: ProductsFilterType, order: ProductsOrderType): [Product!]!
+  getUserProducts(limit: Int!, currentPage: Int = 0, filter: ProductsFilterType, order: ProductsOrderType): [Product!]!
 }
 
 input ProductsFilterType {
@@ -78,6 +81,7 @@ input ProductsFilterType {
 input ProductsOrderType {
   createdAt: OrderEnum
   price: OrderEnum
+  isPublished: OrderEnum
 }
 
 enum OrderEnum {
@@ -94,8 +98,8 @@ type Mutation {
   createIngredient(name: String!, price: Float!, unit: String!): Ingredient!
   updateIngredient(name: String!, price: Float!, unit: String!, id: Int!): Ingredient!
   deleteIngredient(id: [Int!]!): Boolean!
-  createProduct(name: String!, price: Float!, count: Float!, isPublished: Boolean = false): Product!
-  updateProduct(name: String!, price: Float!, count: Float!, isPublished: Boolean = false, id: Int!): Product!
+  createProduct(name: String!, price: Float!, count: Float!, isPublished: Boolean = false, delivery: Boolean = false, shipping: Boolean = false, pickup: Boolean = false): Product!
+  updateProduct(name: String!, price: Float!, count: Float!, isPublished: Boolean = false, delivery: Boolean = false, shipping: Boolean = false, pickup: Boolean = false, id: Int!): Product!
   deleteProduct(id: [Int!]!): Boolean!
   createProductIngredient(count: Float!, product: Float!, ingredient: Float!): ProductIngredient!
   updateProductIngredient(count: Float!, product: Float!, ingredient: Float!, id: Int!): ProductIngredient!

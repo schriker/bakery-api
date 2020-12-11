@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { Repository } from 'typeorm';
+import { Any, Repository } from 'typeorm';
 import { CreateProductArgs } from './dto/createProduct.args';
-import { GetProductsArgs, OrderEnum } from './dto/getProducts.args';
+import { GetProductsArgs } from './dto/getProducts.args';
 import { Product } from './entities/product.entity';
 
 @Injectable()
@@ -14,6 +14,12 @@ export class ProductsService {
   ) {}
 
   async createProduct(args: CreateProductArgs, user: User): Promise<Product> {
+    if (!args.pickup && !args.shipping && !args.delivery) {
+      throw new BadRequestException(
+        'At least one delivery method is required.',
+      );
+    }
+
     const result = await this.productRepository
       .createQueryBuilder()
       .insert()
@@ -37,7 +43,7 @@ export class ProductsService {
     publishedOnly: boolean,
   ): Promise<Product[]> {
     let where = {
-      isPublished: publishedOnly,
+      isPublished: publishedOnly ? true : Any([false, true]),
     };
 
     if (args.filter) {
@@ -48,20 +54,11 @@ export class ProductsService {
     }
 
     return this.productRepository.find({
-      where,
+      where: where,
       order: {
-        createdAt:
-          args.order?.createdAt === OrderEnum.DESC
-            ? 'DESC'
-            : args.order?.createdAt === OrderEnum.ASC
-            ? 'ASC'
-            : null,
-        price:
-          args.order?.price === OrderEnum.DESC
-            ? 'DESC'
-            : args.order?.price === OrderEnum.ASC
-            ? 'ASC'
-            : null,
+        createdAt: args.order?.createdAt || null,
+        price: args.order?.price || null,
+        isPublished: args.order?.isPublished || null,
       },
       take: args.limit,
       skip: args.currentPage * args.limit,
