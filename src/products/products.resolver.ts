@@ -6,6 +6,7 @@ import { Action } from 'src/casl/types/casl.types';
 import { CurrentUser } from 'src/users/decorators/currentUser.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { CreateProductArgs } from './dto/createProduct.args';
+import { GetProductsArgs } from './dto/getProducts.args';
 import { Product } from './entities/product.entity';
 import { ProductsService } from './products.service';
 
@@ -40,13 +41,22 @@ export class ProductsResolver {
   @Mutation(() => Product)
   createProduct(@Args() args: CreateProductArgs, @CurrentUser() user: User) {
     this.checkAbility(Action.Manage, user, Product);
-
     return this.productsService.createProduct(args, user);
   }
 
   @Query(() => [Product])
-  products() {
-    return this.productsService.getProducts();
+  products(@Args() args: GetProductsArgs) {
+    return this.productsService.getProducts(args, true);
+  }
+
+  @Query(() => [Product])
+  @UseGuards(GQLSessionGuard)
+  getUserProducts(@CurrentUser() user: User, @Args() args: GetProductsArgs) {
+    args.filter = {
+      ...args.filter,
+      user: user.id,
+    };
+    return this.productsService.getProducts(args, false);
   }
 
   @UseGuards(GQLSessionGuard)

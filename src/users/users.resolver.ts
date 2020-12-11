@@ -1,4 +1,4 @@
-import { forwardRef, Inject, UseGuards } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import {
   Args,
   Context,
@@ -9,8 +9,6 @@ import {
 } from '@nestjs/graphql';
 import { GQLAuthGuard } from 'src/auth/guards/gql-local-auth.guard';
 import { GQLSessionGuard } from 'src/auth/guards/gql-session-auth.guard';
-import { IngredientsService } from 'src/ingredients/ingredients.service';
-import { ProductsService } from 'src/products/products.service';
 import { CurrentUser } from './decorators/currentUser.decorator';
 import { CreateSellerArgs } from './dto/createSeller.args';
 import { CreateUserArgs } from './dto/createUser.args';
@@ -20,13 +18,7 @@ import { UsersService } from './users.service';
 
 @Resolver(() => User)
 export class UsersResolver {
-  constructor(
-    private usersService: UsersService,
-    @Inject(forwardRef(() => IngredientsService))
-    private ingredientsService: IngredientsService,
-    @Inject(forwardRef(() => ProductsService))
-    private productsService: ProductsService,
-  ) {}
+  constructor(private usersService: UsersService) {}
 
   @Mutation(() => User)
   createUser(@Args() args: CreateUserArgs) {
@@ -62,21 +54,20 @@ export class UsersResolver {
   }
 
   @ResolveField()
-  @UseGuards(GQLSessionGuard)
-  ingredients(@CurrentUser() user: User) {
-    return this.ingredientsService.findIngredientsByUser(user);
+  email(@CurrentUser() user: User) {
+    if (user) {
+      return user.email;
+    } else {
+      return '';
+    }
   }
 
   @ResolveField()
-  @UseGuards(GQLSessionGuard)
-  products(@CurrentUser() user: User) {
-    return this.productsService.findProductsByUser(user);
-  }
-
-  @ResolveField()
-  @UseGuards(GQLSessionGuard)
-  async city(@CurrentUser() user: User) {
-    const { city } = await this.usersService.findUserById(user.id);
-    return city;
+  lastName(@CurrentUser() user: User) {
+    if (user) {
+      return user.lastName;
+    } else {
+      return null;
+    }
   }
 }

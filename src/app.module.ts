@@ -24,7 +24,7 @@ import { CitiesModule } from './cities/cities.module';
           'request.credentials': 'include',
         },
       },
-      validationRules: [depthLimit(4)],
+      validationRules: [depthLimit(3)],
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
     UsersModule,

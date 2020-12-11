@@ -1,9 +1,4 @@
-import {
-  ForbiddenException,
-  forwardRef,
-  Inject,
-  UseGuards,
-} from '@nestjs/common';
+import { ForbiddenException, UseGuards } from '@nestjs/common';
 import {
   Args,
   Mutation,
@@ -26,7 +21,6 @@ import { IngredientsService } from './ingredients.service';
 export class IngredientsResolver {
   constructor(
     private ingredeintsService: IngredientsService,
-    @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
     private caslIngredientAbilityFactory: CaslIngredientAbilityFactory,
   ) {}

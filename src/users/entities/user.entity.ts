@@ -39,19 +39,16 @@ export class User {
   @Column({ default: false })
   isSeller: boolean;
 
-  @Field(() => [Ingredient], { nullable: true })
   @OneToMany(() => Ingredient, (ingredeint) => ingredeint.user, {
     nullable: true,
   })
   ingredients: Ingredient[];
 
-  @Field(() => [Product], { nullable: true })
   @OneToMany(() => Product, (product) => product.user, {
     nullable: true,
   })
   products: Product[];
 
-  @Field(() => [ProductIngredient], { nullable: true })
   @OneToMany(
     () => ProductIngredient,
     (productIngredient) => productIngredient.user,

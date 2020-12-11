@@ -1,4 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   PrimaryGeneratedColumn,
@@ -51,4 +52,9 @@ export class City {
     nullable: true,
   })
   users: User[];
+
+  @OneToMany(() => Product, (product) => product.city, {
+    nullable: true,
+  })
+  products: Product[];
 }

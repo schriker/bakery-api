@@ -17,7 +17,12 @@ export class UsersService {
   ) {}
 
   findUserById(id: number) {
-    return this.usersRepository.findOne(id, { relations: ['city'] });
+    return this.usersRepository.findOne({
+      where: {
+        id: id,
+      },
+      relations: ['city'],
+    });
   }
 
   async createUser(args: CreateUserArgs): Promise<User> {
@@ -81,7 +86,10 @@ export class UsersService {
 
   async validateUser(args: ValidateUserArgs) {
     const user = await this.usersRepository.findOne({
-      email: args.email,
+      where: {
+        email: args.email,
+      },
+      relations: ['city'],
     });
 
     if (!user) {
