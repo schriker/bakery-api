@@ -6,15 +6,19 @@ import { Upload } from 'src/products/dto/createProduct.args';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { Photo } from './entities/photo.entity';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class PhotosService {
   constructor(
     @InjectRepository(Photo)
     private photosRepository: Repository<Photo>,
+    @InjectQueue('photo')
+    private photoQueue: Queue,
   ) {}
 
-  createPathForFile(filename: string) {
+  createPathForFile() {
     try {
       const uuid = uuidv4();
       const filePath = join(__dirname, '..', '..', 'uploads', 'photos', uuid);
@@ -23,17 +27,17 @@ export class PhotosService {
         mkdirSync(filePath);
       }
 
-      return `${filePath}/${filename}`;
+      return filePath;
     } catch (e) {
       throw new Error(e);
     }
   }
 
-  async savePhotoFile(photo: Upload) {
+  private async savePhotoFile(photo: Upload) {
     const acceptedImageTypes = ['image/jpeg', 'image/png'];
     const file = await photo;
     const stream = file.createReadStream();
-    const filePath = this.createPathForFile(file.filename);
+    const filePath = this.createPathForFile();
 
     if (!acceptedImageTypes.includes(file.mimetype)) {
       throw new BadRequestException('Invalid image file type.');
@@ -44,12 +48,21 @@ export class PhotosService {
         .on('error', (error) => {
           reject(error);
         })
-        .pipe(createWriteStream(filePath))
+        .pipe(createWriteStream(`${filePath}/${file.filename}`))
         .on('error', reject)
-        .on('finish', () => {
+        .on('finish', async () => {
           const photo = new Photo();
           photo.name = file.filename;
           photo.url = filePath;
+          await this.photoQueue.add(
+            {
+              path: filePath,
+              name: file.filename,
+            },
+            {
+              removeOnComplete: true,
+            },
+          );
           resolve(photo);
         });
     });

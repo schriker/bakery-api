@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as depthLimit from 'graphql-depth-limit';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -12,7 +12,8 @@ import { ProductsModule } from './products/products.module';
 import { ProductIngredientsModule } from './product-ingredients/product-ingredients.module';
 import { CitiesModule } from './cities/cities.module';
 import { PhotosModule } from './photos/photos.module';
-// import { ServeStaticModule } from '@nestjs/serve-static';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -27,15 +28,27 @@ import { PhotosModule } from './photos/photos.module';
         },
       },
       uploads: {
-        maxFileSize: 5000000, // 20 MB
+        maxFileSize: 5000000, // 5 MB
         maxFiles: 10,
       },
       validationRules: [depthLimit(3)],
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
-    // ServeStaticModule.forRoot({
-    //   rootPath: join(__dirname, '..', 'uploads'),
-    // }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      exclude: ['/graphql'],
+    }),
+    BullModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => {
+        return {
+          redis: {
+            host: configService.get('REDIS_HOST') || 'localhost',
+            port: parseInt(configService.get('REDIS_PORT')) || 6379,
+          },
+        };
+      },
+    }),
     UsersModule,
     AuthModule,
     IngredientsModule,
