@@ -46,8 +46,12 @@ export class ProductsResolver {
     @CurrentUser() user: User,
   ) {
     this.checkAbility(Action.Manage, user, Product);
-    await this.photosService.savePhoto(args.photos);
-    return this.productsService.createProduct(args, user);
+    if (args.photos) {
+      const photos = await this.photosService.createPhoto(args.photos);
+      return this.productsService.createProduct(args, user, photos);
+    } else {
+      return this.productsService.createProduct(args, user);
+    }
   }
 
   @Query(() => [Product])
@@ -79,7 +83,7 @@ export class ProductsResolver {
     return this.productsService.updateProduct({
       ...product,
       ...args,
-      photos: [],
+      photos: product.photos,
     });
   }
 

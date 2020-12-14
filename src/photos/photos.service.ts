@@ -39,7 +39,7 @@ export class PhotosService {
       throw new BadRequestException('Invalid image file type.');
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise<Photo>((resolve, reject) => {
       stream
         .on('error', (error) => {
           reject(error);
@@ -47,21 +47,32 @@ export class PhotosService {
         .pipe(createWriteStream(filePath))
         .on('error', reject)
         .on('finish', () => {
-          resolve(filePath);
+          const photo = new Photo();
+          photo.name = file.filename;
+          photo.url = filePath;
+          resolve(photo);
         });
     });
   }
 
-  savePhoto(photos: Upload | Upload[]) {
-    return new Promise<void>(async (resolve) => {
+  savePhotos(photos: Photo[]) {
+    return this.photosRepository.save(photos);
+  }
+
+  createPhoto(photos: Upload | Upload[]) {
+    return new Promise<Photo[]>(async (resolve) => {
+      const photosEntities: Photo[] = [];
+
       if (Array.isArray(photos)) {
         for await (const photo of photos) {
-          await this.savePhotoFile(photo);
+          const result = await this.savePhotoFile(photo);
+          photosEntities.push(result);
         }
       } else {
-        await this.savePhotoFile(photos);
+        const result = await this.savePhotoFile(photos);
+        photosEntities.push(result);
       }
-      resolve();
+      resolve(photosEntities);
     });
   }
 }

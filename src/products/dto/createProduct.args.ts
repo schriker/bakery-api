@@ -53,6 +53,6 @@ export class CreateProductArgs {
   pickup: boolean;
 
   @Exclude()
-  @Field(() => GraphQLUpload)
-  photos: Upload;
+  @Field(() => GraphQLUpload, { nullable: true })
+  photos?: Upload;
 }

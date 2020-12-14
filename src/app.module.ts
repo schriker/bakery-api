@@ -12,7 +12,7 @@ import { ProductsModule } from './products/products.module';
 import { ProductIngredientsModule } from './product-ingredients/product-ingredients.module';
 import { CitiesModule } from './cities/cities.module';
 import { PhotosModule } from './photos/photos.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
+// import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
@@ -33,9 +33,9 @@ import { ServeStaticModule } from '@nestjs/serve-static';
       validationRules: [depthLimit(3)],
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
-    }),
+    // ServeStaticModule.forRoot({
+    //   rootPath: join(__dirname, '..', 'uploads'),
+    // }),
     UsersModule,
     AuthModule,
     IngredientsModule,

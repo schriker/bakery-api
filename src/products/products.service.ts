@@ -1,5 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Photo } from 'src/photos/entities/photo.entity';
+import { PhotosService } from 'src/photos/photos.service';
 import { User } from 'src/users/entities/user.entity';
 import { Any, Repository } from 'typeorm';
 import { CreateProductArgs } from './dto/createProduct.args';
@@ -11,9 +13,14 @@ export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+    private photosService: PhotosService,
   ) {}
 
-  async createProduct(args: CreateProductArgs, user: User): Promise<Product> {
+  async createProduct(
+    args: CreateProductArgs,
+    user: User,
+    photos?: Photo[] | undefined,
+  ): Promise<Product> {
     if (!args.pickup && !args.shipping && !args.delivery) {
       throw new BadRequestException(
         'At least one delivery method is required.',
@@ -31,12 +38,26 @@ export class ProductsService {
         photos: [],
       })
       .execute();
-    return {
+
+    const product = {
       ...args,
       user: user,
       city: user.city,
       ...result.raw[0],
     };
+
+    if (photos) {
+      photos.forEach((photo) => {
+        photo.user = user;
+        photo.product = product;
+      });
+
+      const savedPhotos = await this.photosService.savePhotos(photos);
+
+      return { ...product, photos: savedPhotos };
+    } else {
+      return product;
+    }
   }
 
   getProducts(
@@ -63,27 +84,27 @@ export class ProductsService {
       },
       take: args.limit,
       skip: args.currentPage * args.limit,
-      relations: ['user', 'productIngredients', 'city'],
+      relations: ['user', 'productIngredients', 'city', 'photos'],
     });
   }
 
   findProductsByUser(user: User): Promise<Product[]> {
     return this.productRepository.find({
       where: { user: user },
-      relations: ['user', 'productIngredients', 'city'],
+      relations: ['user', 'productIngredients', 'city', 'photos'],
     });
   }
 
   findProductById(id: number) {
     return this.productRepository.findOne({
       where: { id: id },
-      relations: ['user', 'productIngredients', 'city'],
+      relations: ['user', 'productIngredients', 'city', 'photos'],
     });
   }
 
   findProductsById(id: number[]) {
     return this.productRepository.findByIds(id, {
-      relations: ['user', 'productIngredients', 'city'],
+      relations: ['user', 'productIngredients', 'city', 'photos'],
     });
   }
 
