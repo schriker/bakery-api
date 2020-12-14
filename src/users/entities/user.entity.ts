@@ -12,6 +12,7 @@ import {
 import { Product } from 'src/products/entities/product.entity';
 import { ProductIngredient } from 'src/product-ingredients/entities/product-ingredient.entity';
 import { City } from 'src/cities/entities/city.entity';
+import { Photo } from 'src/photos/entities/photo.entity';
 
 @Entity('user')
 @ObjectType()
@@ -63,6 +64,11 @@ export class User {
     nullable: true,
   })
   city: City;
+
+  @OneToMany(() => Photo, (photo) => photo.user, {
+    nullable: true,
+  })
+  photos: ProductIngredient[];
 
   @Field()
   @CreateDateColumn()

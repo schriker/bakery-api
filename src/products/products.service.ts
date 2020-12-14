@@ -28,6 +28,7 @@ export class ProductsService {
         ...args,
         user: user,
         city: user.city,
+        photos: [],
       })
       .execute();
     return {

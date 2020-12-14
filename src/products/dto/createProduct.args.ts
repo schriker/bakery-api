@@ -7,6 +7,16 @@ import {
   Max,
   MinLength,
 } from 'class-validator';
+import { GraphQLUpload } from 'apollo-server-express';
+import { Exclude } from 'class-transformer';
+import { Stream } from 'stream';
+
+export interface Upload {
+  filename: string;
+  mimetype: string;
+  encoding: string;
+  createReadStream: () => Stream;
+}
 
 @ArgsType()
 export class CreateProductArgs {
@@ -41,4 +51,8 @@ export class CreateProductArgs {
   @Field({ defaultValue: false })
   @IsBoolean()
   pickup: boolean;
+
+  @Exclude()
+  @Field(() => GraphQLUpload)
+  photos: Upload;
 }

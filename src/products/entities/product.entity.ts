@@ -1,5 +1,6 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { City } from 'src/cities/entities/city.entity';
+import { Photo } from 'src/photos/entities/photo.entity';
 import { ProductIngredient } from 'src/product-ingredients/entities/product-ingredient.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
@@ -72,4 +73,10 @@ export class Product {
     },
   )
   productIngredients: ProductIngredient[];
+
+  @Field(() => [Photo], { nullable: true })
+  @OneToMany(() => Photo, (photo) => photo.product, {
+    nullable: true,
+  })
+  photos: Photo[];
 }

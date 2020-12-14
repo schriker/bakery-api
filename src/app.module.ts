@@ -11,6 +11,8 @@ import { CaslModule } from './casl/casl.module';
 import { ProductsModule } from './products/products.module';
 import { ProductIngredientsModule } from './product-ingredients/product-ingredients.module';
 import { CitiesModule } from './cities/cities.module';
+import { PhotosModule } from './photos/photos.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
@@ -24,8 +26,15 @@ import { CitiesModule } from './cities/cities.module';
           'request.credentials': 'include',
         },
       },
+      uploads: {
+        maxFileSize: 5000000, // 20 MB
+        maxFiles: 10,
+      },
       validationRules: [depthLimit(3)],
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
     }),
     UsersModule,
     AuthModule,
@@ -34,6 +43,7 @@ import { CitiesModule } from './cities/cities.module';
     ProductsModule,
     ProductIngredientsModule,
     CitiesModule,
+    PhotosModule,
   ],
 })
 export class AppModule {}

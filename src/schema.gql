@@ -2,15 +2,14 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type User {
+type ProductIngredient {
   id: Int!
-  email: String!
-  firstName: String
-  lastName: String
-  isSeller: Boolean!
-  city: City
   createdAt: DateTime!
   updatedAt: DateTime!
+  count: Int!
+  user: User!
+  product: Product!
+  ingredient: Ingredient!
 }
 
 """
@@ -29,14 +28,23 @@ type Ingredient {
   updatedAt: DateTime!
 }
 
-type ProductIngredient {
+type User {
+  id: Int!
+  email: String!
+  firstName: String
+  lastName: String
+  isSeller: Boolean!
+  city: City
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Photo {
   id: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
-  count: Int!
-  user: User!
-  product: Product!
-  ingredient: Ingredient!
+  name: String!
+  url: String!
 }
 
 type Product {
@@ -53,6 +61,7 @@ type Product {
   user: User!
   city: City!
   productIngredients: [ProductIngredient!]
+  photos: [Photo!]
 }
 
 type City {
@@ -67,6 +76,7 @@ type City {
 }
 
 type Query {
+  searchCity(query: String!): [City!]!
   me: User!
   ingredients: [Ingredient!]!
   products(limit: Int!, currentPage: Int = 0, filter: ProductsFilterType, order: ProductsOrderType): [Product!]!
@@ -90,7 +100,6 @@ enum OrderEnum {
 }
 
 type Mutation {
-  searchCity(query: String!): [City!]!
   createUser(email: String!, password: String!): User!
   createSeller(email: String!, password: String!, firstName: String!, lastName: String!, city: Float!): User!
   login(email: String!, password: String!): Boolean!
@@ -98,10 +107,13 @@ type Mutation {
   createIngredient(name: String!, price: Float!, unit: String!): Ingredient!
   updateIngredient(name: String!, price: Float!, unit: String!, id: Int!): Ingredient!
   deleteIngredient(id: [Int!]!): Boolean!
-  createProduct(name: String!, price: Float!, count: Float!, isPublished: Boolean = false, delivery: Boolean = false, shipping: Boolean = false, pickup: Boolean = false): Product!
-  updateProduct(name: String!, price: Float!, count: Float!, isPublished: Boolean = false, delivery: Boolean = false, shipping: Boolean = false, pickup: Boolean = false, id: Int!): Product!
+  createProduct(name: String!, price: Float!, count: Float!, isPublished: Boolean = false, delivery: Boolean = false, shipping: Boolean = false, pickup: Boolean = false, photos: Upload!): Product!
+  updateProduct(name: String!, price: Float!, count: Float!, isPublished: Boolean = false, delivery: Boolean = false, shipping: Boolean = false, pickup: Boolean = false, photos: Upload!, id: Int!): Product!
   deleteProduct(id: [Int!]!): Boolean!
   createProductIngredient(count: Float!, product: Float!, ingredient: Float!): ProductIngredient!
   updateProductIngredient(count: Float!, product: Float!, ingredient: Float!, id: Int!): ProductIngredient!
   deleteProductIngredient(id: [Int!]!): Boolean!
 }
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
