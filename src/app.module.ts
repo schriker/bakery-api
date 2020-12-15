@@ -29,7 +29,6 @@ import { BullModule } from '@nestjs/bull';
       },
       uploads: {
         maxFileSize: 5000000, // 5 MB
-        maxFiles: 10,
       },
       validationRules: [depthLimit(3)],
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
