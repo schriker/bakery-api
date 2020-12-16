@@ -9,6 +9,7 @@ import {
 } from '@nestjs/graphql';
 import { GQLAuthGuard } from 'src/auth/guards/gql-local-auth.guard';
 import { GQLSessionGuard } from 'src/auth/guards/gql-session-auth.guard';
+import { MailingService } from 'src/mailing/mailing.service';
 import { CurrentUser } from './decorators/currentUser.decorator';
 import { CreateSellerArgs } from './dto/createSeller.args';
 import { CreateUserArgs } from './dto/createUser.args';
@@ -18,7 +19,10 @@ import { UsersService } from './users.service';
 
 @Resolver(() => User)
 export class UsersResolver {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private mailingService: MailingService,
+  ) {}
 
   @Mutation(() => User)
   createUser(@Args() args: CreateUserArgs) {
@@ -33,6 +37,7 @@ export class UsersResolver {
   @Query(() => User)
   @UseGuards(GQLSessionGuard)
   me(@CurrentUser() user: User): User {
+    this.mailingService.sendVerificationEmail();
     return {
       ...user,
       createdAt: new Date(user.createdAt),

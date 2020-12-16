@@ -16,6 +16,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { BullModule } from '@nestjs/bull';
 import { UploadsService } from './uploads/uploads.service';
 import { UploadsModule } from './uploads/uploads.module';
+import { MailingModule } from './mailing/mailing.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { UploadsModule } from './uploads/uploads.module';
     CitiesModule,
     PhotosModule,
     UploadsModule,
+    MailingModule,
   ],
   providers: [UploadsService],
 })

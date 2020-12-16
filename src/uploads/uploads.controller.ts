@@ -28,11 +28,11 @@ export class UploadsController {
     @UploadedFile() file,
     @CurrentSessionUser() user: User,
   ) {
-    const result = await this.photosService.savePhoto(file, user);
+    const { id, name, url } = await this.photosService.savePhoto(file, user);
     return {
-      id: result.id,
-      url: result.url,
-      name: result.name,
+      id,
+      name,
+      url,
     };
   }
 }
