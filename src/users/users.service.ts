@@ -7,6 +7,9 @@ import * as bcrypt from 'bcrypt';
 import { ValidateUserArgs } from './dto/validateUser.args';
 import { CreateSellerArgs } from './dto/createSeller.args';
 import { CitiesService } from 'src/cities/cities.service';
+import * as jwt from 'jsonwebtoken';
+import { ConfigService } from '@nestjs/config';
+import { MailingService } from 'src/mailing/mailing.service';
 
 @Injectable()
 export class UsersService {
@@ -14,6 +17,8 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private citiesService: CitiesService,
+    private configService: ConfigService,
+    private mailingService: MailingService,
   ) {}
 
   findUserById(id: number) {
@@ -35,6 +40,10 @@ export class UsersService {
     }
 
     const hash = await bcrypt.hash(args.password, 10);
+    const token = jwt.sign(
+      { email: args.email },
+      this.configService.get('JWT_SECRET'),
+    );
 
     const result = await this.usersRepository
       .createQueryBuilder()
@@ -43,14 +52,20 @@ export class UsersService {
       .values({
         email: args.email,
         password: hash,
+        firstName: args.firstName,
         isSeller: false,
+        verificationToken: token,
       })
       .execute();
 
-    return {
+    const user = {
       ...args,
       ...result.raw[0],
     };
+
+    this.mailingService.sendVerificationEmail(user, token);
+
+    return user;
   }
 
   async createSeller(args: CreateSellerArgs): Promise<User> {
@@ -64,6 +79,11 @@ export class UsersService {
     }
 
     const hash = await bcrypt.hash(args.password, 10);
+    const token = jwt.sign(
+      { email: args.email },
+      this.configService.get('JWT_SECRET'),
+    );
+
     const result = await this.usersRepository
       .createQueryBuilder()
       .insert()
@@ -75,13 +95,34 @@ export class UsersService {
         lastName: args.lastName,
         isSeller: true,
         city: city,
+        verificationToken: token,
       })
       .execute();
 
-    return {
+    const user = {
       ...args,
       ...result.raw[0],
     };
+
+    this.mailingService.sendVerificationEmail(user, token);
+
+    return user;
+  }
+
+  async emailVerification(token: string) {
+    try {
+      jwt.verify(token, this.configService.get('JWT_SECRET'));
+      const user = await this.usersRepository.findOne({
+        where: {
+          verificationToken: token,
+        },
+      });
+      user.isVerified = true;
+      await this.usersRepository.save(user);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   async validateUser(args: ValidateUserArgs) {

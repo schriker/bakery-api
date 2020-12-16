@@ -10,4 +10,8 @@ export class CreateUserArgs {
   @Field()
   @MinLength(6)
   password: string;
+
+  @Field()
+  @MinLength(2)
+  firstName: string;
 }

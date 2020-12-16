@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as Email from 'email-templates';
 import { join } from 'path';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class MailingService {
@@ -26,16 +27,17 @@ export class MailingService {
     });
   }
 
-  sendVerificationEmail() {
+  sendVerificationEmail(user: User, token: string) {
     this.email
       .send({
-        template: join(this.templatesPath, 'test'),
+        template: join(this.templatesPath, 'verification'),
         message: {
           to: 'janekmachine@gmail.com',
         },
-        // locals: {
-        //   name: 'Elon',
-        // },
+        locals: {
+          name: user.firstName,
+          token: token,
+        },
       })
       .catch(console.error);
   }

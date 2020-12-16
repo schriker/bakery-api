@@ -57,7 +57,7 @@ export class Product {
   pickup: boolean;
 
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.ingredients)
+  @ManyToOne(() => User, (user) => user.ingredients, { onDelete: 'CASCADE' })
   user: User;
 
   @Field(() => City)

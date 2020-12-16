@@ -28,13 +28,23 @@ export class User {
   @Column()
   password: string;
 
-  @Field({ nullable: true })
-  @Column({ nullable: true })
-  firstName?: string;
+  @Field()
+  @Column()
+  firstName: string;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
   lastName?: string;
+
+  @Field({ defaultValue: false })
+  @Column({ default: false })
+  isVerified: boolean;
+
+  @Column()
+  verificationToken: string;
+
+  @Column({ nullable: true })
+  passwordResetToken: string;
 
   @Field({ defaultValue: false })
   @Column({ default: false })

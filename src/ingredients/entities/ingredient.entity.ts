@@ -32,7 +32,7 @@ export class Ingredient {
   unit: string;
 
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.ingredients)
+  @ManyToOne(() => User, (user) => user.ingredients, { onDelete: 'CASCADE' })
   user: User;
 
   @Field(() => [ProductIngredient], { nullable: true })

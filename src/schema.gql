@@ -31,8 +31,9 @@ type Ingredient {
 type User {
   id: Int!
   email: String!
-  firstName: String
+  firstName: String!
   lastName: String
+  isVerified: Boolean!
   isSeller: Boolean!
   city: City
   createdAt: DateTime!
@@ -100,10 +101,11 @@ enum OrderEnum {
 }
 
 type Mutation {
-  createUser(email: String!, password: String!): User!
+  createUser(email: String!, password: String!, firstName: String!): User!
   createSeller(email: String!, password: String!, firstName: String!, lastName: String!, city: Float!): User!
   login(email: String!, password: String!): Boolean!
   logout: Boolean!
+  emailVerification(token: String!): Boolean!
   createIngredient(name: String!, price: Float!, unit: String!): Ingredient!
   updateIngredient(name: String!, price: Float!, unit: String!, id: Int!): Ingredient!
   deleteIngredient(id: [Int!]!): Boolean!
