@@ -46,7 +46,6 @@
     "graphql": "^15.4.0",
     "graphql-depth-limit": "^1.1.0",
     "graphql-tools": "^7.0.2",
-    "graphql-upload": "^11.0.0",
     "helmet": "^4.2.0",
     "install": "^0.13.0",
     "ioredis": "^4.19.2",

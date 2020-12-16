@@ -1,4 +1,4 @@
-import { ArgsType, Field } from '@nestjs/graphql';
+import { ArgsType, Field, Int } from '@nestjs/graphql';
 import {
   IsBoolean,
   IsInt,
@@ -7,15 +7,15 @@ import {
   Max,
   MinLength,
 } from 'class-validator';
-import { GraphQLUpload } from 'apollo-server-express';
 import { Exclude } from 'class-transformer';
-import { Stream } from 'stream';
 
 export interface Upload {
-  filename: string;
-  mimetype: string;
+  fieldname: string;
+  originalname: string;
   encoding: string;
-  createReadStream: () => Stream;
+  mimetype: string;
+  buffer: Buffer;
+  size: number;
 }
 
 @ArgsType()
@@ -53,6 +53,6 @@ export class CreateProductArgs {
   pickup: boolean;
 
   @Exclude()
-  @Field(() => GraphQLUpload, { nullable: true })
-  photos?: Upload;
+  @Field(() => [Int], { nullable: true })
+  photos: number[];
 }

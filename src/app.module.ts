@@ -14,6 +14,8 @@ import { CitiesModule } from './cities/cities.module';
 import { PhotosModule } from './photos/photos.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { BullModule } from '@nestjs/bull';
+import { UploadsService } from './uploads/uploads.service';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -27,9 +29,7 @@ import { BullModule } from '@nestjs/bull';
           'request.credentials': 'include',
         },
       },
-      uploads: {
-        maxFileSize: 5000000, // 5 MB
-      },
+      uploads: false,
       validationRules: [depthLimit(3)],
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
@@ -56,6 +56,8 @@ import { BullModule } from '@nestjs/bull';
     ProductIngredientsModule,
     CitiesModule,
     PhotosModule,
+    UploadsModule,
   ],
+  providers: [UploadsService],
 })
 export class AppModule {}

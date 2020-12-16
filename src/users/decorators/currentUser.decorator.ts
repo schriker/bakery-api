@@ -7,3 +7,10 @@ export const CurrentUser = createParamDecorator(
     return ctx.getContext().req.user;
   },
 );
+
+export const CurrentSessionUser = createParamDecorator(
+  (data: unknown, context: ExecutionContext) => {
+    const request = context.switchToHttp().getRequest();
+    return request.session.passport.user;
+  },
+);

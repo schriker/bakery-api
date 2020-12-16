@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Photo } from 'src/photos/entities/photo.entity';
 import { PhotosService } from 'src/photos/photos.service';
 import { User } from 'src/users/entities/user.entity';
 import { Any, Repository } from 'typeorm';
@@ -16,11 +15,7 @@ export class ProductsService {
     private photosService: PhotosService,
   ) {}
 
-  async createProduct(
-    args: CreateProductArgs,
-    user: User,
-    photos?: Photo[] | undefined,
-  ): Promise<Product> {
+  async createProduct(args: CreateProductArgs, user: User): Promise<Product> {
     if (!args.pickup && !args.shipping && !args.delivery) {
       throw new BadRequestException(
         'At least one delivery method is required.',
@@ -46,13 +41,12 @@ export class ProductsService {
       ...result.raw[0],
     };
 
-    if (photos) {
-      photos.forEach((photo) => {
-        photo.user = user;
-        photo.product = product;
-      });
-
-      const savedPhotos = await this.photosService.savePhotos(photos);
+    if (args.photos) {
+      const savedPhotos = await this.photosService.updatePhotoProduct(
+        args.photos,
+        user,
+        product,
+      );
 
       return { ...product, photos: savedPhotos };
     } else {

@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  UseGuards,
-} from '@nestjs/common';
+import { ForbiddenException, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query, Int } from '@nestjs/graphql';
 import { GQLSessionGuard } from 'src/auth/guards/gql-session-auth.guard';
 import { CaslProductAbilityFactory } from 'src/casl/casl-product-ability.factory';
@@ -49,17 +45,8 @@ export class ProductsResolver {
     @Args() args: CreateProductArgs,
     @CurrentUser() user: User,
   ) {
-    try {
-      this.checkAbility(Action.Manage, user, Product);
-      if (args.photos) {
-        const photos = await this.photosService.createPhoto(args.photos);
-        return this.productsService.createProduct(args, user, photos);
-      } else {
-        return this.productsService.createProduct(args, user);
-      }
-    } catch (e) {
-      throw new BadRequestException(e);
-    }
+    this.checkAbility(Action.Manage, user, Product);
+    return this.productsService.createProduct(args, user);
   }
 
   @Query(() => [Product])

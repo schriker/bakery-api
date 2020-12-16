@@ -1,19 +1,26 @@
 import { InjectQueue } from '@nestjs/bull';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Queue } from 'bull';
-import {
-  createWriteStream,
-  existsSync,
-  mkdirSync,
-  rmdir,
-  unlinkSync,
-} from 'fs';
+import { existsSync, mkdirSync, rmdir, unlinkSync, writeFile } from 'fs';
 import { join } from 'path';
+import { CaslPhotoAbilityFactory } from 'src/casl/casl-photo-ability.factory';
+import { Action } from 'src/casl/types/casl.types';
 import { Upload } from 'src/products/dto/createProduct.args';
+import { Product } from 'src/products/entities/product.entity';
+import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { Photo } from './entities/photo.entity';
+
+type FilePathType = {
+  filePath: string;
+  url: string;
+};
 
 @Injectable()
 export class PhotosService {
@@ -22,9 +29,30 @@ export class PhotosService {
     private photosRepository: Repository<Photo>,
     @InjectQueue('photo')
     private photoQueue: Queue,
+    private caslPhotoAbilityFactory: CaslPhotoAbilityFactory,
   ) {}
 
-  createPathForFile() {
+  private checkAbility(
+    action: Action,
+    user: User,
+    photo: Photo | Photo[] | typeof Photo,
+  ) {
+    const ability = this.caslPhotoAbilityFactory.createForUser(user);
+
+    if (Array.isArray(photo)) {
+      photo.forEach((photo) => {
+        if (!ability.can(Action.Manage, photo)) {
+          throw new ForbiddenException();
+        }
+      });
+    } else {
+      if (!ability.can(action, photo)) {
+        throw new ForbiddenException();
+      }
+    }
+  }
+
+  private createPathForFile() {
     try {
       const uuid = uuidv4();
       const filePath = join(__dirname, '..', '..', 'uploads', 'photos', uuid);
@@ -39,80 +67,59 @@ export class PhotosService {
     }
   }
 
-  private async savePhotoFile(photo: Upload) {
+  private async savePhotoFile(photoFile: Upload) {
     try {
       const acceptedImageTypes = ['image/jpeg', 'image/png'];
-      const file = await photo;
-      const stream = file.createReadStream();
-      const photoFile = this.createPathForFile();
 
-      if (!acceptedImageTypes.includes(file.mimetype)) {
+      if (!acceptedImageTypes.includes(photoFile.mimetype)) {
         throw new BadRequestException('Invalid image file type.');
       }
 
-      return new Promise<Photo>((resolve, reject) => {
-        const writeStream = createWriteStream(
-          `${photoFile.filePath}/${file.filename}`,
-        );
-        writeStream.on('finish', async () => {
-          try {
-            const photo = new Photo();
-            photo.name = file.filename;
-            photo.url = `${photoFile.url}/${file.filename}`;
+      const photoPath = this.createPathForFile();
+
+      return new Promise<FilePathType>((resolve, reject) => {
+        writeFile(
+          `${photoPath.filePath}/${photoFile.originalname}`,
+          photoFile.buffer,
+          async (error) => {
+            if (error) {
+              unlinkSync(`${photoPath.filePath}/${photoFile.originalname}`);
+              rmdir(photoPath.filePath, () => {
+                reject(error);
+              });
+            }
             await this.photoQueue.add({
-              path: photoFile.filePath,
-              name: file.filename,
+              path: photoPath.filePath,
+              name: photoFile.originalname,
             });
             this.photoQueue.clean(5000);
-            resolve(photo);
-          } catch (e) {
-            console.log(e);
-          }
-        });
-
-        writeStream.on('error', (error) => {
-          unlinkSync(`${photoFile.filePath}/${file.filename}`);
-          rmdir(photoFile.filePath, () => {
-            reject(error);
-          });
-        });
-
-        stream.on('error', (error) => {
-          reject(error);
-          writeStream.destroy(error);
-        });
-        stream.pipe(writeStream);
+            resolve(photoPath);
+          },
+        );
       });
     } catch (e) {
       console.log(e);
     }
   }
 
-  savePhotos(photos: Photo[]) {
-    return this.photosRepository.save(photos);
+  async savePhoto(photoFile: Upload, user: User) {
+    this.checkAbility(Action.Manage, user, Photo);
+    const photoFileData = await this.savePhotoFile(photoFile);
+    const photoData = new Photo();
+    photoData.name = photoFile.originalname;
+    photoData.url = photoFileData.url;
+    photoData.user = user;
+    return this.photosRepository.save(photoData);
   }
 
-  createPhoto(photos: Upload | Upload[]) {
-    return new Promise<Photo[]>(async (resolve, reject) => {
-      try {
-        const photosEntities: Photo[] = [];
-
-        if (Array.isArray(photos)) {
-          if (photos.length > 5) {
-            throw new Error('Max number of photos 5');
-          }
-          for await (const photo of photos) {
-            const result = await this.savePhotoFile(photo);
-            photosEntities.push(result);
-          }
-        } else {
-          const result = await this.savePhotoFile(photos);
-          photosEntities.push(result);
-        }
-        resolve(photosEntities);
-      } catch (e) {
-        reject(e);
-      }
+  async updatePhotoProduct(photosIds: number[], user: User, product: Product) {
+    const photos = await this.photosRepository.findByIds(photosIds, {
+      relations: ['user'],
     });
+    this.checkAbility(Action.Manage, user, photos);
+    photos.forEach((photo) => {
+      photo.product = product;
+    });
+    return this.photosRepository.save(photos);
   }
 }
