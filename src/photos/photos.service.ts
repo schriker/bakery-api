@@ -39,7 +39,7 @@ export class PhotosService {
     private caslPhotoAbilityFactory: CaslPhotoAbilityFactory,
   ) {}
 
-  private checkAbility(
+  checkAbility(
     action: Action,
     user: User,
     photo: Photo | Photo[] | typeof Photo,
@@ -160,5 +160,15 @@ export class PhotosService {
       photo.product = product;
     });
     return this.photosRepository.save(photos);
+  }
+
+  findPhotosById(id: number[]) {
+    return this.photosRepository.findByIds(id, {
+      relations: ['user'],
+    });
+  }
+
+  deletePhotosById(id: number[]) {
+    return this.photosRepository.delete(id);
   }
 }

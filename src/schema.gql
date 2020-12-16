@@ -107,6 +107,7 @@ type Mutation {
   createIngredient(name: String!, price: Float!, unit: String!): Ingredient!
   updateIngredient(name: String!, price: Float!, unit: String!, id: Int!): Ingredient!
   deleteIngredient(id: [Int!]!): Boolean!
+  deletePhoto(id: [Int!]!): Boolean!
   createProduct(name: String!, price: Float!, count: Float!, isPublished: Boolean = false, delivery: Boolean = false, shipping: Boolean = false, pickup: Boolean = false, photos: [Int!]): Product!
   updateProduct(name: String!, price: Float!, count: Float!, isPublished: Boolean = false, delivery: Boolean = false, shipping: Boolean = false, pickup: Boolean = false, photos: [Int!], id: Int!): Product!
   deleteProduct(id: [Int!]!): Boolean!

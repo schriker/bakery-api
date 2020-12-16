@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CaslModule } from 'src/casl/casl.module';
 import { Photo } from './entities/photo.entity';
 import { PhotoConsumer } from './photos.processor';
+import { PhotosResolver } from './photos.resolver';
 import { PhotosService } from './photos.service';
 
 @Module({
@@ -15,6 +16,6 @@ import { PhotosService } from './photos.service';
     }),
   ],
   exports: [PhotosService],
-  providers: [PhotosService, PhotoConsumer],
+  providers: [PhotosService, PhotoConsumer, PhotosResolver],
 })
 export class PhotosModule {}
