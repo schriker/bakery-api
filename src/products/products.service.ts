@@ -102,8 +102,11 @@ export class ProductsService {
     });
   }
 
-  deleteProductsById(id: number[]) {
-    return this.productRepository.delete(id);
+  async deleteProductsById(id: number[]) {
+    const product = await this.productRepository.findByIds(id, {
+      relations: ['photos'],
+    });
+    return this.productRepository.remove(product);
   }
 
   updateProduct(product: Product) {

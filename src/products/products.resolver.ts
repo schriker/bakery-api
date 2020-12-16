@@ -3,7 +3,6 @@ import { Args, Mutation, Resolver, Query, Int } from '@nestjs/graphql';
 import { GQLSessionGuard } from 'src/auth/guards/gql-session-auth.guard';
 import { CaslProductAbilityFactory } from 'src/casl/casl-product-ability.factory';
 import { Action } from 'src/casl/types/casl.types';
-import { PhotosService } from 'src/photos/photos.service';
 import { CurrentUser } from 'src/users/decorators/currentUser.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { CreateProductArgs } from './dto/createProduct.args';
@@ -16,7 +15,6 @@ export class ProductsResolver {
   constructor(
     private caslProductAbilityFactory: CaslProductAbilityFactory,
     private productsService: ProductsService,
-    private photosService: PhotosService,
   ) {}
 
   checkAbility(

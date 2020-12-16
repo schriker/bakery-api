@@ -6,7 +6,14 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Queue } from 'bull';
-import { existsSync, mkdirSync, rmdir, unlinkSync, writeFile } from 'fs';
+import {
+  existsSync,
+  mkdirSync,
+  rmdir,
+  rmdirSync,
+  unlinkSync,
+  writeFile,
+} from 'fs';
 import { join } from 'path';
 import { CaslPhotoAbilityFactory } from 'src/casl/casl-photo-ability.factory';
 import { Action } from 'src/casl/types/casl.types';
@@ -100,6 +107,38 @@ export class PhotosService {
     } catch (e) {
       console.log(e);
     }
+  }
+
+  removePhotoFiles(photos: Photo[]) {
+    photos.forEach((photo) => {
+      const thumbnail = join(
+        __dirname,
+        '..',
+        '..',
+        'uploads',
+        `${photo.url}/full_${photo.name}`,
+      );
+      const full = join(
+        __dirname,
+        '..',
+        '..',
+        'uploads',
+        `${photo.url}/thumbnail_${photo.name}`,
+      );
+      const folder = join(__dirname, '..', '..', 'uploads', photo.url);
+
+      if (existsSync(thumbnail)) {
+        unlinkSync(thumbnail);
+      }
+
+      if (existsSync(full)) {
+        unlinkSync(full);
+      }
+
+      if (existsSync(folder)) {
+        rmdirSync(folder);
+      }
+    });
   }
 
   async savePhoto(photoFile: Upload, user: User) {
