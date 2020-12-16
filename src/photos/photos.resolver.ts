@@ -1,6 +1,7 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Int, Mutation, Resolver } from '@nestjs/graphql';
 import { GQLSessionGuard } from 'src/auth/guards/gql-session-auth.guard';
+import { CaslService } from 'src/casl/casl.service';
 import { Action } from 'src/casl/types/casl.types';
 import { CurrentUser } from 'src/users/decorators/currentUser.decorator';
 import { User } from 'src/users/entities/user.entity';
@@ -9,7 +10,10 @@ import { PhotosService } from './photos.service';
 
 @Resolver(() => Photo)
 export class PhotosResolver {
-  constructor(private photosService: PhotosService) {}
+  constructor(
+    private photosService: PhotosService,
+    private caslService: CaslService,
+  ) {}
 
   @Mutation(() => Boolean)
   @UseGuards(GQLSessionGuard)
@@ -18,7 +22,7 @@ export class PhotosResolver {
     @Args('id', { type: () => [Int] }) id: number[],
   ) {
     const photos = await this.photosService.findPhotosById(id);
-    this.photosService.checkAbility(Action.Manage, user, photos);
+    this.caslService.checkAbilityForPhoto(Action.Manage, user, photos);
     this.photosService.removePhotoFiles(photos);
     this.photosService.deletePhotosById(id);
     return true;

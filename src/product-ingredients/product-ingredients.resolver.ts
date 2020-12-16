@@ -1,4 +1,4 @@
-import { ForbiddenException, UseGuards } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import {
   Args,
   Int,
@@ -8,9 +8,7 @@ import {
   Resolver,
 } from '@nestjs/graphql';
 import { GQLSessionGuard } from 'src/auth/guards/gql-session-auth.guard';
-import { CaslIngredientAbilityFactory } from 'src/casl/casl-ingredient-ability.factory';
-import { CaslProductAbilityFactory } from 'src/casl/casl-product-ability.factory';
-import { CaslProductIngredientAbilityFactory } from 'src/casl/casl-product-ingredient-ability.factory';
+import { CaslService } from 'src/casl/casl.service';
 import { Action } from 'src/casl/types/casl.types';
 import { Ingredient } from 'src/ingredients/entities/ingredient.entity';
 import { IngredientsService } from 'src/ingredients/ingredients.service';
@@ -25,51 +23,11 @@ import { ProductIngredientsService } from './product-ingredients.service';
 @Resolver(() => ProductIngredient)
 export class ProductIngredientsResolver {
   constructor(
-    private caslProductIngredientAbilityFactory: CaslProductIngredientAbilityFactory,
-    private caslProductAbilityFactory: CaslProductAbilityFactory,
-    private caslIngredientAbilityFactory: CaslIngredientAbilityFactory,
     private productsService: ProductsService,
     private ingredientsService: IngredientsService,
     private productIngredientsService: ProductIngredientsService,
+    private caslService: CaslService,
   ) {}
-
-  checkAbility(
-    action: Action,
-    user: User,
-    product: Product | typeof Product,
-    ingredient: Ingredient | typeof Ingredient,
-    productIngredient:
-      | ProductIngredient
-      | ProductIngredient[]
-      | typeof ProductIngredient,
-  ) {
-    const productAbility = this.caslProductAbilityFactory.createForUser(user);
-    const ingredientAbility = this.caslIngredientAbilityFactory.createForUser(
-      user,
-    );
-    const productIngredientAbility = this.caslProductIngredientAbilityFactory.createForUser(
-      user,
-    );
-
-    if (Array.isArray(productIngredient)) {
-      productIngredient.forEach((productIngredient) => {
-        if (!productIngredientAbility.can(action, productIngredient)) {
-          throw new ForbiddenException();
-        }
-      });
-    } else {
-      if (!productIngredientAbility.can(action, productIngredient)) {
-        throw new ForbiddenException();
-      }
-    }
-
-    if (
-      !productAbility.can(action, product) ||
-      !ingredientAbility.can(action, ingredient)
-    ) {
-      throw new ForbiddenException();
-    }
-  }
 
   @Mutation(() => ProductIngredient)
   @UseGuards(GQLSessionGuard)
@@ -81,7 +39,8 @@ export class ProductIngredientsResolver {
     const ingredient = await this.ingredientsService.findIngredientById(
       args.ingredient,
     );
-    this.checkAbility(
+
+    this.caslService.checkAbilityForProuctIngredient(
       Action.Manage,
       user,
       product,
@@ -111,7 +70,8 @@ export class ProductIngredientsResolver {
     const productIngredient = await this.productIngredientsService.findProductIngredientById(
       id,
     );
-    this.checkAbility(
+
+    this.caslService.checkAbilityForProuctIngredient(
       Action.Manage,
       user,
       product,
@@ -135,7 +95,7 @@ export class ProductIngredientsResolver {
       id,
     );
 
-    this.checkAbility(
+    this.caslService.checkAbilityForProuctIngredient(
       Action.Manage,
       user,
       Product,

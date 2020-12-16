@@ -1,4 +1,4 @@
-import { ForbiddenException, UseGuards } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import {
   Args,
   Mutation,
@@ -8,7 +8,7 @@ import {
   Int,
 } from '@nestjs/graphql';
 import { GQLSessionGuard } from 'src/auth/guards/gql-session-auth.guard';
-import { CaslIngredientAbilityFactory } from 'src/casl/casl-ingredient-ability.factory';
+import { CaslService } from 'src/casl/casl.service';
 import { Action } from 'src/casl/types/casl.types';
 import { CurrentUser } from 'src/users/decorators/currentUser.decorator';
 import { User } from 'src/users/entities/user.entity';
@@ -22,28 +22,8 @@ export class IngredientsResolver {
   constructor(
     private ingredeintsService: IngredientsService,
     private usersService: UsersService,
-    private caslIngredientAbilityFactory: CaslIngredientAbilityFactory,
+    private caslService: CaslService,
   ) {}
-
-  checkAbility(
-    action: Action,
-    user: User,
-    ingredient: Ingredient | Ingredient[] | typeof Ingredient,
-  ) {
-    const ability = this.caslIngredientAbilityFactory.createForUser(user);
-
-    if (Array.isArray(ingredient)) {
-      ingredient.forEach((ingredient) => {
-        if (!ability.can(Action.Manage, ingredient)) {
-          throw new ForbiddenException();
-        }
-      });
-    } else {
-      if (!ability.can(action, ingredient)) {
-        throw new ForbiddenException();
-      }
-    }
-  }
 
   @UseGuards(GQLSessionGuard)
   @Query(() => [Ingredient])
@@ -63,7 +43,7 @@ export class IngredientsResolver {
     @Args() args: CreateIngredientArgs,
     @CurrentUser() user: User,
   ) {
-    this.checkAbility(Action.Manage, user, Ingredient);
+    this.caslService.checkAbilityForIngredient(Action.Manage, user, Ingredient);
 
     return this.ingredeintsService.createIngredient(args, user);
   }
@@ -77,7 +57,7 @@ export class IngredientsResolver {
   ) {
     const ingredient = await this.ingredeintsService.findIngredientById(id);
 
-    this.checkAbility(Action.Manage, user, ingredient);
+    this.caslService.checkAbilityForIngredient(Action.Manage, user, ingredient);
 
     return this.ingredeintsService.updateIngredient({
       ...ingredient,
@@ -92,7 +72,12 @@ export class IngredientsResolver {
     @CurrentUser() user: User,
   ) {
     const ingredients = await this.ingredeintsService.findIngredientsById(id);
-    this.checkAbility(Action.Manage, user, ingredients);
+
+    this.caslService.checkAbilityForIngredient(
+      Action.Manage,
+      user,
+      ingredients,
+    );
 
     await this.ingredeintsService.deleteIngredientsById(id);
 

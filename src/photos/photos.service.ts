@@ -1,9 +1,5 @@
 import { InjectQueue } from '@nestjs/bull';
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Queue } from 'bull';
 import {
@@ -15,7 +11,7 @@ import {
   writeFile,
 } from 'fs';
 import { join } from 'path';
-import { CaslPhotoAbilityFactory } from 'src/casl/casl-photo-ability.factory';
+import { CaslService } from 'src/casl/casl.service';
 import { Action } from 'src/casl/types/casl.types';
 import { Upload } from 'src/products/dto/createProduct.args';
 import { Product } from 'src/products/entities/product.entity';
@@ -36,28 +32,8 @@ export class PhotosService {
     private photosRepository: Repository<Photo>,
     @InjectQueue('photo')
     private photoQueue: Queue,
-    private caslPhotoAbilityFactory: CaslPhotoAbilityFactory,
+    private caslService: CaslService,
   ) {}
-
-  checkAbility(
-    action: Action,
-    user: User,
-    photo: Photo | Photo[] | typeof Photo,
-  ) {
-    const ability = this.caslPhotoAbilityFactory.createForUser(user);
-
-    if (Array.isArray(photo)) {
-      photo.forEach((photo) => {
-        if (!ability.can(Action.Manage, photo)) {
-          throw new ForbiddenException();
-        }
-      });
-    } else {
-      if (!ability.can(action, photo)) {
-        throw new ForbiddenException();
-      }
-    }
-  }
 
   private createPathForFile() {
     try {
@@ -111,21 +87,10 @@ export class PhotosService {
 
   removePhotoFiles(photos: Photo[]) {
     photos.forEach((photo) => {
-      const thumbnail = join(
-        __dirname,
-        '..',
-        '..',
-        'uploads',
-        `${photo.url}/full_${photo.name}`,
-      );
-      const full = join(
-        __dirname,
-        '..',
-        '..',
-        'uploads',
-        `${photo.url}/thumbnail_${photo.name}`,
-      );
-      const folder = join(__dirname, '..', '..', 'uploads', photo.url);
+      const uploadsPath = join(__dirname, '..', '..', 'uploads');
+      const thumbnail = join(uploadsPath, `${photo.url}/full_${photo.name}`);
+      const full = join(uploadsPath, `${photo.url}/thumbnail_${photo.name}`);
+      const folder = join(uploadsPath, photo.url);
 
       if (existsSync(thumbnail)) {
         unlinkSync(thumbnail);
@@ -142,7 +107,7 @@ export class PhotosService {
   }
 
   async savePhoto(photoFile: Upload, user: User) {
-    this.checkAbility(Action.Manage, user, Photo);
+    this.caslService.checkAbilityForPhoto(Action.Manage, user, Photo);
     const photoFileData = await this.savePhotoFile(photoFile);
     const photoData = new Photo();
     photoData.name = photoFile.originalname;
@@ -155,7 +120,7 @@ export class PhotosService {
     const photos = await this.photosRepository.findByIds(photosIds, {
       relations: ['user'],
     });
-    this.checkAbility(Action.Manage, user, photos);
+    this.caslService.checkAbilityForPhoto(Action.Manage, user, photos);
     photos.forEach((photo) => {
       photo.product = product;
     });
