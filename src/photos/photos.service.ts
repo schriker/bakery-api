@@ -51,38 +51,34 @@ export class PhotosService {
   }
 
   private async savePhotoFile(photoFile: Upload) {
-    try {
-      const acceptedImageTypes = ['image/jpeg', 'image/png'];
+    const acceptedImageTypes = ['image/jpeg', 'image/png'];
 
-      if (!acceptedImageTypes.includes(photoFile.mimetype)) {
-        throw new BadRequestException('Invalid image file type.');
-      }
-
-      const photoPath = this.createPathForFile();
-
-      return new Promise<FilePathType>((resolve, reject) => {
-        writeFile(
-          `${photoPath.filePath}/${photoFile.originalname}`,
-          photoFile.buffer,
-          async (error) => {
-            if (error) {
-              unlinkSync(`${photoPath.filePath}/${photoFile.originalname}`);
-              rmdir(photoPath.filePath, () => {
-                reject(error);
-              });
-            }
-            await this.photoQueue.add({
-              path: photoPath.filePath,
-              name: photoFile.originalname,
-            });
-            this.photoQueue.clean(5000);
-            resolve(photoPath);
-          },
-        );
-      });
-    } catch (e) {
-      console.log(e);
+    if (!acceptedImageTypes.includes(photoFile.mimetype)) {
+      throw new BadRequestException('Invalid image file type');
     }
+
+    const photoPath = this.createPathForFile();
+
+    return new Promise<FilePathType>((resolve, reject) => {
+      writeFile(
+        `${photoPath.filePath}/${photoFile.originalname}`,
+        photoFile.buffer,
+        async (error) => {
+          if (error) {
+            unlinkSync(`${photoPath.filePath}/${photoFile.originalname}`);
+            rmdir(photoPath.filePath, () => {
+              reject(error);
+            });
+          }
+          await this.photoQueue.add({
+            path: photoPath.filePath,
+            name: photoFile.originalname,
+          });
+          this.photoQueue.clean(5000);
+          resolve(photoPath);
+        },
+      );
+    });
   }
 
   removePhotoFiles(photos: Photo[]) {

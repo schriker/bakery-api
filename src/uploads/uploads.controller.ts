@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Post,
   UploadedFile,
@@ -28,6 +29,9 @@ export class UploadsController {
     @UploadedFile() file,
     @CurrentSessionUser() user: User,
   ) {
+    if (!file) {
+      throw new BadRequestException('No file');
+    }
     const { id, name, url } = await this.photosService.savePhoto(file, user);
     return {
       id,

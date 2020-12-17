@@ -28,6 +28,23 @@ type Ingredient {
   updatedAt: DateTime!
 }
 
+type Conversation {
+  id: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  messages: [Message!]!
+  participants: [User!]!
+}
+
+type Message {
+  id: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  text: String!
+  user: User!
+  conversation: Conversation!
+}
+
 type User {
   id: Int!
   email: String!
@@ -36,6 +53,7 @@ type User {
   isVerified: Boolean!
   isSeller: Boolean!
   city: City
+  conversations: [Conversation!]
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -82,6 +100,8 @@ type Query {
   ingredients: [Ingredient!]!
   products(limit: Int!, currentPage: Int = 0, filter: ProductsFilterType, order: ProductsOrderType): [Product!]!
   getUserProducts(limit: Int!, currentPage: Int = 0, filter: ProductsFilterType, order: ProductsOrderType): [Product!]!
+  getUserConversations: [Conversation!]!
+  getConversationMessages(id: Float!): Conversation!
 }
 
 input ProductsFilterType {
@@ -116,4 +136,5 @@ type Mutation {
   createProductIngredient(count: Float!, product: Float!, ingredient: Float!): ProductIngredient!
   updateProductIngredient(count: Float!, product: Float!, ingredient: Float!, id: Int!): ProductIngredient!
   deleteProductIngredient(id: [Int!]!): Boolean!
+  createConversation(text: String!, to: Int!): Boolean!
 }

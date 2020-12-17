@@ -15,7 +15,7 @@ export class CaslPhotoAbilityFactory {
       Ability as AbilityClass<AppAbility>,
     );
 
-    if (user.isSeller) {
+    if (user.isSeller && user.isVerified) {
       can(Action.Manage, Photo, { 'user.id': user.id });
     }
 

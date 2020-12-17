@@ -66,13 +66,4 @@ export class UsersResolver {
       return '';
     }
   }
-
-  @ResolveField()
-  lastName(@CurrentUser() user: User) {
-    if (user) {
-      return user.lastName;
-    } else {
-      return null;
-    }
-  }
 }

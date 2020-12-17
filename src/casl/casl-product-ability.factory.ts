@@ -15,7 +15,7 @@ export class CaslProductAbilityFactory {
       Ability as AbilityClass<AppAbility>,
     );
 
-    if (user.isSeller) {
+    if (user.isSeller && user.isVerified) {
       can(Action.Manage, Product, { 'user.id': user.id });
     }
 

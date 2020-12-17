@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -13,6 +14,8 @@ import { Product } from 'src/products/entities/product.entity';
 import { ProductIngredient } from 'src/product-ingredients/entities/product-ingredient.entity';
 import { City } from 'src/cities/entities/city.entity';
 import { Photo } from 'src/photos/entities/photo.entity';
+import { Message } from 'src/messages/entities/message.entity';
+import { Conversation } from 'src/messages/entities/conversation.entity';
 
 @Entity('user')
 @ObjectType()
@@ -79,6 +82,17 @@ export class User {
     nullable: true,
   })
   photos: ProductIngredient[];
+
+  @OneToMany(() => Message, (message) => message.user, {
+    nullable: true,
+  })
+  messages: Message[];
+
+  @Field(() => [Conversation], { nullable: true })
+  @ManyToMany(() => Conversation, (conversation) => conversation.participants, {
+    nullable: true,
+  })
+  conversations: Conversation[];
 
   @Field()
   @CreateDateColumn()

@@ -15,7 +15,7 @@ export class CaslIngredientAbilityFactory {
       Ability as AbilityClass<AppAbility>,
     );
 
-    if (user.isSeller) {
+    if (user.isSeller && user.isVerified) {
       can(Action.Manage, Ingredient, { 'user.id': user.id });
     }
 

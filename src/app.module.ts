@@ -17,6 +17,7 @@ import { BullModule } from '@nestjs/bull';
 import { UploadsService } from './uploads/uploads.service';
 import { UploadsModule } from './uploads/uploads.module';
 import { MailingModule } from './mailing/mailing.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { MailingModule } from './mailing/mailing.module';
     PhotosModule,
     UploadsModule,
     MailingModule,
+    MessagesModule,
   ],
   providers: [UploadsService],
 })
