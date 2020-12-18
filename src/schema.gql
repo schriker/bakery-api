@@ -53,7 +53,6 @@ type User {
   isVerified: Boolean!
   isSeller: Boolean!
   city: City
-  conversations: [Conversation!]
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -100,8 +99,8 @@ type Query {
   ingredients: [Ingredient!]!
   products(limit: Int!, currentPage: Int = 0, filter: ProductsFilterType, order: ProductsOrderType): [Product!]!
   getUserProducts(limit: Int!, currentPage: Int = 0, filter: ProductsFilterType, order: ProductsOrderType): [Product!]!
-  getUserConversations: [Conversation!]!
-  getConversationMessages(id: Float!): Conversation!
+  getUserMessages: [Message!]!
+  getConversation(id: Float!): Conversation!
 }
 
 input ProductsFilterType {
@@ -137,4 +136,5 @@ type Mutation {
   updateProductIngredient(count: Float!, product: Float!, ingredient: Float!, id: Int!): ProductIngredient!
   deleteProductIngredient(id: [Int!]!): Boolean!
   createConversation(text: String!, to: Int!): Boolean!
+  createMessage(text: String!, conversation: Float!): Boolean!
 }

@@ -88,7 +88,6 @@ export class User {
   })
   messages: Message[];
 
-  @Field(() => [Conversation], { nullable: true })
   @ManyToMany(() => Conversation, (conversation) => conversation.participants, {
     nullable: true,
   })

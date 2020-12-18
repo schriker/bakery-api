@@ -30,21 +30,33 @@ export class MessagesResolver {
     return true;
   }
 
-  @Query(() => [Conversation])
+  // Check if user can participate to that conversation
+  @Mutation(() => Boolean)
   @UseGuards(GQLSessionGuard)
-  getUserConversations(@CurrentUser() user: User) {
-    return this.messagesService.getUserConversations(user);
+  async createMessage(
+    @CurrentUser() user: User,
+    @Args('conversation') conversationId: number,
+    @Args() message: MessageArgs,
+  ) {
+    const conversation = await this.messagesService.getConversation(
+      conversationId,
+    );
+    await this.messagesService.createMessage(user, message, conversation);
+    return true;
+  }
+
+  @Query(() => [Message])
+  @UseGuards(GQLSessionGuard)
+  getUserMessages(@CurrentUser() user: User) {
+    return this.messagesService.getUserMessages(user);
   }
 
   // Check if user is one of participant to read conversation
   @Query(() => Conversation)
   @UseGuards(GQLSessionGuard)
-  async getConversationMessages(
-    @CurrentUser() user: User,
-    @Args('id') id: number,
-  ) {
-    const messages = await this.messagesService.getConversationMessages(id);
+  async getConversation(@CurrentUser() user: User, @Args('id') id: number) {
+    const conversation = await this.messagesService.getConversation(id);
 
-    return messages;
+    return conversation;
   }
 }
