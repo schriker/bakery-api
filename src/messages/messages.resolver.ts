@@ -1,6 +1,8 @@
-import { UseGuards } from '@nestjs/common';
+import { BadRequestException, UseGuards } from '@nestjs/common';
 import { Args, Int, Mutation, Resolver, Query } from '@nestjs/graphql';
 import { GQLSessionGuard } from 'src/auth/guards/gql-session-auth.guard';
+import { CaslService } from 'src/casl/casl.service';
+import { Action } from 'src/casl/types/casl.types';
 import { CurrentUser } from 'src/users/decorators/currentUser.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
@@ -14,6 +16,7 @@ export class MessagesResolver {
   constructor(
     private messagesService: MessagesService,
     private usersService: UsersService,
+    private caslService: CaslService,
   ) {}
 
   // Guard Conversations Read and Write only for participants
@@ -25,12 +28,19 @@ export class MessagesResolver {
     @Args('to', { type: () => Int }) to: number,
     @Args() message: MessageArgs,
   ) {
+    if (to === user.id) {
+      throw new BadRequestException('Can not send messages to yourself');
+    }
+    this.caslService.checkAbilityForConversation(
+      Action.Create,
+      user,
+      Conversation,
+    );
     const toUser = await this.usersService.findUserById(to);
-    this.messagesService.createConversation(user, toUser, message);
+    await this.messagesService.createConversation(user, toUser, message);
     return true;
   }
 
-  // Check if user can participate to that conversation
   @Mutation(() => Boolean)
   @UseGuards(GQLSessionGuard)
   async createMessage(
@@ -40,6 +50,12 @@ export class MessagesResolver {
   ) {
     const conversation = await this.messagesService.getConversation(
       conversationId,
+    );
+    this.caslService.checkAbilityForConversation(
+      Action.Update,
+      user,
+      Conversation,
+      conversation.participants,
     );
     await this.messagesService.createMessage(user, message, conversation);
     return true;
@@ -51,12 +67,16 @@ export class MessagesResolver {
     return this.messagesService.getUserMessages(user);
   }
 
-  // Check if user is one of participant to read conversation
   @Query(() => Conversation)
   @UseGuards(GQLSessionGuard)
   async getConversation(@CurrentUser() user: User, @Args('id') id: number) {
     const conversation = await this.messagesService.getConversation(id);
-
+    this.caslService.checkAbilityForConversation(
+      Action.Read,
+      user,
+      Conversation,
+      conversation.participants,
+    );
     return conversation;
   }
 }

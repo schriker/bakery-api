@@ -1,9 +1,11 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Ingredient } from 'src/ingredients/entities/ingredient.entity';
+import { Conversation } from 'src/messages/entities/conversation.entity';
 import { Photo } from 'src/photos/entities/photo.entity';
 import { ProductIngredient } from 'src/product-ingredients/entities/product-ingredient.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/users/entities/user.entity';
+import { CaslConversationAbilityFactory } from './casl-conversation-ability.factory';
 import { CaslIngredientAbilityFactory } from './casl-ingredient-ability.factory';
 import { CaslPhotoAbilityFactory } from './casl-photo-ability.factory';
 import { CaslProductAbilityFactory } from './casl-product-ability.factory';
@@ -16,6 +18,7 @@ export class CaslService {
     private caslProductAbilityFactory: CaslProductAbilityFactory,
     private caslPhotoAbilityFactory: CaslPhotoAbilityFactory,
     private caslIngredientAbilityFactory: CaslIngredientAbilityFactory,
+    private caslConversationAbilityFactory: CaslConversationAbilityFactory,
     private caslProductIngredientAbilityFactory: CaslProductIngredientAbilityFactory,
   ) {}
 
@@ -68,12 +71,35 @@ export class CaslService {
 
     if (Array.isArray(ingredient)) {
       ingredient.forEach((ingredient) => {
-        if (!ability.can(Action.Manage, ingredient)) {
+        if (!ability.can(action, ingredient)) {
           throw new ForbiddenException();
         }
       });
     } else {
       if (!ability.can(action, ingredient)) {
+        throw new ForbiddenException();
+      }
+    }
+  }
+
+  checkAbilityForConversation(
+    action: Action,
+    user: User,
+    conversation: Conversation | Conversation[] | typeof Conversation,
+    participants?: User[],
+  ) {
+    const ability = this.caslConversationAbilityFactory.createForUser(
+      user,
+      participants,
+    );
+    if (Array.isArray(conversation)) {
+      conversation.forEach((conversation) => {
+        if (!ability.can(action, conversation)) {
+          throw new ForbiddenException();
+        }
+      });
+    } else {
+      if (!ability.can(action, conversation)) {
         throw new ForbiddenException();
       }
     }

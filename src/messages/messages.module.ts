@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CaslModule } from 'src/casl/casl.module';
 import { User } from 'src/users/entities/user.entity';
 import { UsersModule } from 'src/users/users.module';
 import { Conversation } from './entities/conversation.entity';
@@ -11,6 +12,7 @@ import { MessagesService } from './messages.service';
   imports: [
     TypeOrmModule.forFeature([Conversation, Message, User]),
     UsersModule,
+    CaslModule,
   ],
   providers: [MessagesService, MessagesResolver],
 })
