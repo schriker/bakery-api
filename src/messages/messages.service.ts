@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { MessageArgs } from './dto/message.args';
@@ -17,9 +18,10 @@ export class MessagesService {
     private usersRepository: Repository<User>,
   ) {}
 
-  async createConversation(from: User, to: User, message: MessageArgs) {
+  async createConversation(from: User, product: Product, message: MessageArgs) {
     const conversationData = new Conversation();
-    conversationData.participants = [from, to];
+    conversationData.product = product;
+    conversationData.participants = [from, product.user];
     await this.conversationsRepository.save(conversationData);
 
     const messageData = new Message();
@@ -60,11 +62,15 @@ export class MessagesService {
             "u"."cityId" AS "u_cityId",
             "c"."id" AS "c_id",
             "c"."createdAt" AS "c_createdAt",
-            "c"."updatedAt" AS "c_updatedAt"
+            "c"."updatedAt" AS "c_updatedAt",
+            "p"."id" AS "p_id",
+            "p"."name" AS "p_name",
+            "p"."price" AS "p_price"
           FROM
             "message" "m"
             LEFT JOIN "user" "u" ON "u"."id" = "m"."userId"
             LEFT JOIN "conversation" "c" ON "c"."id" = "m"."conversationId"
+            LEFT JOIN "product" "p" ON "p"."id" = "c"."productId"
           WHERE
             "m"."conversationId" = ANY($1)
           ORDER BY
@@ -85,6 +91,11 @@ export class MessagesService {
         },
         conversation: {
           id: message.c_id,
+          product: {
+            id: message.p_id,
+            name: message.p_name,
+            price: message.p_price,
+          },
         },
       };
     });
@@ -94,7 +105,7 @@ export class MessagesService {
 
   async getConversation(id: number) {
     const conversation = await this.conversationsRepository.findOne(id, {
-      relations: ['participants'],
+      relations: ['participants', 'product'],
     });
 
     const messages = await this.messagesRepository.find({

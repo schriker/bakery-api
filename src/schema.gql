@@ -28,21 +28,12 @@ type Ingredient {
   updatedAt: DateTime!
 }
 
-type Conversation {
+type Photo {
   id: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
-  messages: [Message!]!
-  participants: [User!]!
-}
-
-type Message {
-  id: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  text: String!
-  user: User!
-  conversation: Conversation!
+  name: String!
+  url: String!
 }
 
 type User {
@@ -57,12 +48,22 @@ type User {
   updatedAt: DateTime!
 }
 
-type Photo {
+type Message {
   id: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
-  name: String!
-  url: String!
+  text: String!
+  user: User!
+  conversation: Conversation!
+}
+
+type Conversation {
+  id: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  messages: [Message!]!
+  product: Product!
+  participants: [User!]!
 }
 
 type Product {
@@ -79,6 +80,7 @@ type Product {
   user: User!
   city: City!
   productIngredients: [ProductIngredient!]
+  conversations: [Conversation!]
   photos: [Photo!]
 }
 
@@ -135,6 +137,6 @@ type Mutation {
   createProductIngredient(count: Float!, product: Float!, ingredient: Float!): ProductIngredient!
   updateProductIngredient(count: Float!, product: Float!, ingredient: Float!, id: Int!): ProductIngredient!
   deleteProductIngredient(id: [Int!]!): Boolean!
-  createConversation(text: String!, to: Int!): Boolean!
+  createConversation(text: String!, productId: Int!): Boolean!
   createMessage(text: String!, conversation: Float!): Boolean!
 }
