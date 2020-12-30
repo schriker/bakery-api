@@ -48,7 +48,7 @@ export class MessagesResolver {
   @UseGuards(GQLSessionGuard)
   async createMessage(
     @CurrentUser() user: User,
-    @Args('conversation') conversationId: number,
+    @Args({ name: 'conversation', type: () => Int }) conversationId: number,
     @Args() message: MessageArgs,
   ) {
     const conversation = await this.messagesService.getConversation(
@@ -70,9 +70,21 @@ export class MessagesResolver {
     return this.messagesService.getUserMessages(user);
   }
 
+  @Mutation(() => Boolean)
+  @UseGuards(GQLSessionGuard)
+  readMessage(
+    @CurrentUser() user: User,
+    @Args({ name: 'id', type: () => Int }) id: number,
+  ) {
+    return this.messagesService.readMessage(id, user);
+  }
+
   @Query(() => Conversation)
   @UseGuards(GQLSessionGuard)
-  async getConversation(@CurrentUser() user: User, @Args('id') id: number) {
+  async getConversation(
+    @CurrentUser() user: User,
+    @Args({ name: 'id', type: () => Int }) id: number,
+  ) {
     const conversation = await this.messagesService.getConversation(id);
     this.caslService.checkAbilityForConversation(
       Action.Read,

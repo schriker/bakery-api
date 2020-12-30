@@ -29,6 +29,10 @@ export class Message {
   @Column()
   text: string;
 
+  @Field({ defaultValue: false })
+  @Column({ default: false })
+  readed: boolean;
+
   @Field(() => User)
   @ManyToOne(() => User, (user) => user.messages)
   user: User;

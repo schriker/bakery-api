@@ -53,6 +53,7 @@ type Message {
   createdAt: DateTime!
   updatedAt: DateTime!
   text: String!
+  readed: Boolean!
   user: User!
   conversation: Conversation!
 }
@@ -102,7 +103,7 @@ type Query {
   products(limit: Int!, currentPage: Int = 0, filter: ProductsFilterType, order: ProductsOrderType): [Product!]!
   getUserProducts(limit: Int!, currentPage: Int = 0, filter: ProductsFilterType, order: ProductsOrderType): [Product!]!
   getUserMessages: [Message!]!
-  getConversation(id: Float!): Conversation!
+  getConversation(id: Int!): Conversation!
 }
 
 input ProductsFilterType {
@@ -138,5 +139,6 @@ type Mutation {
   updateProductIngredient(count: Float!, product: Float!, ingredient: Float!, id: Int!): ProductIngredient!
   deleteProductIngredient(id: [Int!]!): Boolean!
   createConversation(text: String!, productId: Int!): Boolean!
-  createMessage(text: String!, conversation: Float!): Boolean!
+  createMessage(text: String!, conversation: Int!): Boolean!
+  readMessage(id: Int!): Boolean!
 }

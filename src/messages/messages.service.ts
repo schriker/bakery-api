@@ -104,9 +104,7 @@ export class MessagesService {
   }
 
   async getConversation(id: number) {
-    const conversation = await this.conversationsRepository.findOne(id, {
-      relations: ['participants', 'product'],
-    });
+    const conversation = await this.getConversationById(id);
 
     const messages = await this.messagesRepository.find({
       where: {
@@ -136,5 +134,34 @@ export class MessagesService {
         conversation: conversation,
       })
       .execute();
+  }
+
+  getMessageById(id: number) {
+    return this.messagesRepository.findOne(id, {
+      relations: ['conversation', 'user'],
+    });
+  }
+
+  getConversationById(id: number) {
+    return this.conversationsRepository.findOne(id, {
+      relations: ['participants', 'product'],
+    });
+  }
+
+  async readMessage(id: number, user: User) {
+    const message = await this.getMessageById(id);
+    const conversation = await this.getConversationById(
+      message.conversation.id,
+    );
+    const isParticipant = conversation.participants
+      .filter((participant) => participant.id !== message.user.id)
+      .some((participant) => participant.id === user.id);
+    if (isParticipant) {
+      message.readed = true;
+      this.messagesRepository.save(message);
+      return true;
+    } else {
+      return false;
+    }
   }
 }
