@@ -142,3 +142,7 @@ type Mutation {
   createMessage(text: String!, conversation: Int!): Boolean!
   readMessage(id: Int!): Boolean!
 }
+
+type Subscription {
+  messageAdded: String!
+}

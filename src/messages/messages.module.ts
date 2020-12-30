@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CaslModule } from 'src/casl/casl.module';
 import { ProductsModule } from 'src/products/products.module';
+import { PubSubModule } from 'src/pub-sub/pub-sub.module';
 import { User } from 'src/users/entities/user.entity';
 import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
@@ -13,6 +14,7 @@ import { MessagesService } from './messages.service';
     TypeOrmModule.forFeature([Conversation, Message, User]),
     CaslModule,
     ProductsModule,
+    PubSubModule,
   ],
   providers: [MessagesService, MessagesResolver],
 })

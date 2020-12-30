@@ -18,6 +18,7 @@ import { UploadsService } from './uploads/uploads.service';
 import { UploadsModule } from './uploads/uploads.module';
 import { MailingModule } from './mailing/mailing.module';
 import { MessagesModule } from './messages/messages.module';
+import { PubSubModule } from './pub-sub/pub-sub.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { MessagesModule } from './messages/messages.module';
           'request.credentials': 'include',
         },
       },
+      installSubscriptionHandlers: true,
       uploads: false,
       validationRules: [depthLimit(3)],
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
@@ -61,6 +63,7 @@ import { MessagesModule } from './messages/messages.module';
     UploadsModule,
     MailingModule,
     MessagesModule,
+    PubSubModule,
   ],
   providers: [UploadsService],
 })

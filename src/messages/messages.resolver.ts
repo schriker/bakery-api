@@ -1,5 +1,13 @@
-import { BadRequestException, UseGuards } from '@nestjs/common';
-import { Args, Int, Mutation, Resolver, Query } from '@nestjs/graphql';
+import { BadRequestException, Inject, UseGuards } from '@nestjs/common';
+import {
+  Args,
+  Int,
+  Mutation,
+  Resolver,
+  Query,
+  Subscription,
+} from '@nestjs/graphql';
+import { RedisPubSub } from 'graphql-redis-subscriptions';
 import { GQLSessionGuard } from 'src/auth/guards/gql-session-auth.guard';
 import { CaslService } from 'src/casl/casl.service';
 import { Action } from 'src/casl/types/casl.types';
@@ -17,7 +25,14 @@ export class MessagesResolver {
     private messagesService: MessagesService,
     private productsService: ProductsService,
     private caslService: CaslService,
+    @Inject('PUB_SUB')
+    private pubSub: RedisPubSub,
   ) {}
+
+  @Subscription(() => String)
+  messageAdded() {
+    return this.pubSub.asyncIterator('messageAdded');
+  }
 
   @Mutation(() => Boolean)
   @UseGuards(GQLSessionGuard)
@@ -61,6 +76,9 @@ export class MessagesResolver {
       conversation.participants,
     );
     await this.messagesService.createMessage(user, message, conversation);
+    this.pubSub.publish('messageAdded', {
+      messageAdded: `Added ${message.text}`,
+    });
     return true;
   }
 
