@@ -9,12 +9,14 @@ import * as passport from 'passport';
 import { ConfigService } from '@nestjs/config';
 import { __prod__ } from './contsants';
 
+let redisClient: Redis.Redis;
+
 async function bootstrap() {
   try {
     const app = await NestFactory.create(AppModule);
     const configService = app.get(ConfigService);
     const RedisStore = connectRedis(session);
-    const redisClient = new Redis(configService.get('REDIS_PORT') || 6379);
+    redisClient = new Redis(configService.get('REDIS_PORT') || 6379);
     app.use(
       helmet({
         contentSecurityPolicy: __prod__ ? undefined : false,
@@ -48,3 +50,5 @@ async function bootstrap() {
   }
 }
 bootstrap();
+
+export { redisClient };

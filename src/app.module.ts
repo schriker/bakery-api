@@ -19,6 +19,8 @@ import { UploadsModule } from './uploads/uploads.module';
 import { MailingModule } from './mailing/mailing.module';
 import { MessagesModule } from './messages/messages.module';
 import { PubSubModule } from './pub-sub/pub-sub.module';
+import { redisClient } from './main';
+import * as cookie from 'cookie';
 
 @Module({
   imports: [
@@ -31,6 +33,25 @@ import { PubSubModule } from './pub-sub/pub-sub.module';
         settings: {
           'request.credentials': 'include',
         },
+      },
+      subscriptions: {
+        onConnect: async (connectionParams, webSocket, context) => {
+          const cookies = cookie.parse(context.request.headers.cookie);
+          const [redisKey] = cookies['connect.sid']
+            .split('s:')
+            .pop()
+            .split('.');
+          const session = JSON.parse(await redisClient.get(`sess:${redisKey}`));
+          return {
+            session,
+          };
+        },
+      },
+      context: async ({ req, connection }) => {
+        if (connection) {
+          return { req: connection.context };
+        }
+        return { req };
       },
       installSubscriptionHandlers: true,
       uploads: false,

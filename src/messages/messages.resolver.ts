@@ -29,7 +29,12 @@ export class MessagesResolver {
     private pubSub: RedisPubSub,
   ) {}
 
-  @Subscription(() => String)
+  @Subscription(() => Message, {
+    filter: (payload, variaibles, context) => {
+      return context.req.session.passport.user.id === payload.user.id;
+    },
+  })
+  @UseGuards(GQLSessionGuard)
   messageAdded() {
     return this.pubSub.asyncIterator('messageAdded');
   }
@@ -75,9 +80,25 @@ export class MessagesResolver {
       Conversation,
       conversation.participants,
     );
-    await this.messagesService.createMessage(user, message, conversation);
+    const result = await this.messagesService.createMessage(
+      user,
+      message,
+      conversation,
+    );
+
+    const newMessage: Message = {
+      ...result.raw[0],
+      text: message.text,
+      user,
+    };
+
+    const [toUser] = conversation.participants.filter(
+      (participant) => participant.id !== user.id,
+    );
+
     this.pubSub.publish('messageAdded', {
-      messageAdded: `Added ${message.text}`,
+      messageAdded: newMessage,
+      user: toUser,
     });
     return true;
   }
