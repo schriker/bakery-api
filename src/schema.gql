@@ -2,6 +2,20 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Category {
+  id: Int!
+  name: String!
+  icon: String!
+  products: [Product!]
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type ProductIngredient {
   id: Int!
   createdAt: DateTime!
@@ -11,11 +25,6 @@ type ProductIngredient {
   product: Product!
   ingredient: Ingredient!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type Ingredient {
   id: Int!
@@ -79,6 +88,7 @@ type Product {
   shipping: Boolean!
   pickup: Boolean!
   user: User!
+  category: Category!
   city: City!
   productIngredients: [ProductIngredient!]
   conversations: [Conversation!]
@@ -97,8 +107,8 @@ type City {
 }
 
 type Query {
-  searchCity(query: String!): [City!]!
   me: User!
+  searchCity(query: String!): [City!]!
   ingredients: [Ingredient!]!
   products(limit: Int!, currentPage: Int = 0, filter: ProductsFilterType, order: ProductsOrderType): [Product!]!
   getUserProducts(limit: Int!, currentPage: Int = 0, filter: ProductsFilterType, order: ProductsOrderType): [Product!]!
@@ -131,10 +141,10 @@ type Mutation {
   createIngredient(name: String!, price: Float!, unit: String!): Ingredient!
   updateIngredient(name: String!, price: Float!, unit: String!, id: Int!): Ingredient!
   deleteIngredient(id: [Int!]!): Boolean!
-  deletePhoto(id: [Int!]!): Boolean!
   createProduct(name: String!, price: Float!, count: Float!, isPublished: Boolean = false, delivery: Boolean = false, shipping: Boolean = false, pickup: Boolean = false, photos: [Int!]): Product!
   updateProduct(name: String!, price: Float!, count: Float!, isPublished: Boolean = false, delivery: Boolean = false, shipping: Boolean = false, pickup: Boolean = false, photos: [Int!], id: Int!): Product!
   deleteProduct(id: [Int!]!): Boolean!
+  deletePhoto(id: [Int!]!): Boolean!
   createProductIngredient(count: Float!, product: Float!, ingredient: Float!): ProductIngredient!
   updateProductIngredient(count: Float!, product: Float!, ingredient: Float!, id: Int!): ProductIngredient!
   deleteProductIngredient(id: [Int!]!): Boolean!

@@ -1,4 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Category } from 'src/categories/entities/category.entity';
 import { City } from 'src/cities/entities/city.entity';
 import { Conversation } from 'src/messages/entities/conversation.entity';
 import { Photo } from 'src/photos/entities/photo.entity';
@@ -60,6 +61,10 @@ export class Product {
   @Field(() => User)
   @ManyToOne(() => User, (user) => user.ingredients, { onDelete: 'CASCADE' })
   user: User;
+
+  @Field(() => Category)
+  @ManyToOne(() => Category, (category) => category.products)
+  category: Category;
 
   @Field(() => City)
   @ManyToOne(() => City, (city) => city.products)

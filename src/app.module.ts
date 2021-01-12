@@ -20,6 +20,7 @@ import { MailingModule } from './mailing/mailing.module';
 import { MessagesModule } from './messages/messages.module';
 import { PubSubModule } from './pub-sub/pub-sub.module';
 import { redisClient } from './main';
+import { CategoriesModule } from './categories/categories.module';
 import * as cookie from 'cookie';
 
 @Module({
@@ -85,6 +86,7 @@ import * as cookie from 'cookie';
     MailingModule,
     MessagesModule,
     PubSubModule,
+    CategoriesModule,
   ],
   providers: [UploadsService],
 })
