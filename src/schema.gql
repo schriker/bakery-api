@@ -6,7 +6,6 @@ type Category {
   id: Int!
   name: String!
   icon: String!
-  products: [Product!]
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -114,6 +113,7 @@ type Query {
   getUserProducts(limit: Int!, currentPage: Int = 0, filter: ProductsFilterType, order: ProductsOrderType): [Product!]!
   getUserMessages: [Message!]!
   getConversation(id: Int!): Conversation!
+  categories: [Category!]!
 }
 
 input ProductsFilterType {

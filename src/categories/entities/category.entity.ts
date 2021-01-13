@@ -24,7 +24,6 @@ export class Category {
   @Column()
   icon: string;
 
-  @Field(() => [Product], { nullable: true })
   @OneToMany(() => Product, (product) => product.category, {
     nullable: true,
   })
