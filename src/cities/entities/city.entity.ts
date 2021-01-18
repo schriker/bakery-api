@@ -8,10 +8,12 @@ import {
   Column,
   Entity,
   OneToMany,
+  Unique,
 } from 'typeorm';
 
 @Entity('city')
 @ObjectType()
+@Unique('UQ_PLACE', ['name', 'district', 'voivodeship'])
 export class City {
   @PrimaryGeneratedColumn()
   @Field(() => Int)

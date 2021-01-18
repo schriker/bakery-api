@@ -11,6 +11,10 @@ export class CategoriesService {
   ) {}
 
   getAllCategories() {
-    return this.categoryRepository.find();
+    return this.categoryRepository.find({
+      order: {
+        name: 'ASC',
+      },
+    });
   }
 }

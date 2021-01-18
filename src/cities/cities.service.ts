@@ -15,7 +15,7 @@ export class CitiesService {
       SELECT *
       FROM city, to_tsquery($1) AS q
       WHERE (document_with_weights @@ q)
-    ) AS t1 ORDER BY ts_rank(t1.document_with_weights, to_tsquery($1)) DESC LIMIT 10;`,
+    ) AS t1 ORDER BY ts_rank(t1.document_with_weights, to_tsquery($1)) DESC LIMIT 20;`,
       [`${query.trim().split(' ').join(' | ')}:*`],
     );
 
