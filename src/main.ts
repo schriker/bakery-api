@@ -22,7 +22,10 @@ async function bootstrap() {
         contentSecurityPolicy: __prod__ ? undefined : false,
       }),
     );
-    app.enableCors();
+    app.enableCors({
+      origin: __prod__ ? '' : 'http://localhost:3000',
+      credentials: true,
+    });
     app.use(
       session({
         secret: configService.get('SESSION_SECRECT'),
@@ -34,9 +37,8 @@ async function bootstrap() {
           disableTTL: true,
         }),
         cookie: {
-          maxAge: 1000 * 60 * 60 * 24 * 7,
           httpOnly: true,
-          sameSite: 'lax',
+          sameSite: false,
           secure: __prod__,
         },
       }),

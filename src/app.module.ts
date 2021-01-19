@@ -35,6 +35,10 @@ import * as cookie from 'cookie';
           'request.credentials': 'include',
         },
       },
+      cors: {
+        credentials: true,
+        origin: true,
+      },
       subscriptions: {
         onConnect: async (connectionParams, webSocket, context) => {
           const cookies = cookie.parse(context.request.headers.cookie);
