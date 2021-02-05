@@ -3,6 +3,7 @@ import { Args, Mutation, Resolver, Query, Int } from '@nestjs/graphql';
 import { GQLSessionGuard } from 'src/auth/guards/gql-session-auth.guard';
 import { CaslService } from 'src/casl/casl.service';
 import { Action } from 'src/casl/types/casl.types';
+import { CategoriesService } from 'src/categories/categories.service';
 import { CurrentUser } from 'src/users/decorators/currentUser.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { CreateProductArgs } from './dto/createProduct.args';
@@ -14,6 +15,7 @@ import { ProductsService } from './products.service';
 export class ProductsResolver {
   constructor(
     private productsService: ProductsService,
+    private categoriesService: CategoriesService,
     private caslService: CaslService,
   ) {}
 
@@ -50,11 +52,15 @@ export class ProductsResolver {
     @CurrentUser() user: User,
   ) {
     const product = await this.productsService.findProductById(id);
+    const category = await this.categoriesService.findCategoryById(
+      args.category,
+    );
     this.caslService.checkAbilityForProduct(Action.Manage, user, product);
 
     return this.productsService.updateProduct({
       ...product,
       ...args,
+      category: category,
       photos: product.photos,
     });
   }

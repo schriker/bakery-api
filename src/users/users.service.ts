@@ -93,6 +93,7 @@ export class UsersService {
         password: hash,
         firstName: args.firstName,
         lastName: args.lastName,
+        phone: args.phone,
         isSeller: true,
         city: city,
         verificationToken: token,

@@ -53,6 +53,10 @@ export class CreateProductArgs {
   pickup: boolean;
 
   @Exclude()
+  @Field(() => Int)
+  category: number;
+
+  @Exclude()
   @Field(() => [Int], { nullable: true })
   photos: number[];
 }

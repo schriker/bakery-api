@@ -49,6 +49,7 @@ type User {
   email: String!
   firstName: String!
   lastName: String
+  phone: String
   isVerified: Boolean!
   isSeller: Boolean!
   city: City
@@ -80,6 +81,7 @@ type Product {
   createdAt: DateTime!
   updatedAt: DateTime!
   name: String!
+  slug: String!
   price: Float!
   count: Int!
   isPublished: Boolean!
@@ -111,9 +113,9 @@ type Query {
   ingredients: [Ingredient!]!
   products(limit: Int!, currentPage: Int = 0, filter: ProductsFilterType, order: ProductsOrderType): [Product!]!
   getUserProducts(limit: Int!, currentPage: Int = 0, filter: ProductsFilterType, order: ProductsOrderType): [Product!]!
+  categories: [Category!]!
   getUserMessages: [Message!]!
   getConversation(id: Int!): Conversation!
-  categories: [Category!]!
 }
 
 input ProductsFilterType {
@@ -134,15 +136,15 @@ enum OrderEnum {
 
 type Mutation {
   createUser(email: String!, password: String!, firstName: String!): User!
-  createSeller(email: String!, password: String!, firstName: String!, lastName: String!, city: Float!): User!
+  createSeller(email: String!, password: String!, firstName: String!, lastName: String!, phone: String!, city: Float!): User!
   login(email: String!, password: String!): Boolean!
   logout: Boolean!
   emailVerification(token: String!): Boolean!
   createIngredient(name: String!, price: Float!, unit: String!): Ingredient!
   updateIngredient(name: String!, price: Float!, unit: String!, id: Int!): Ingredient!
   deleteIngredient(id: [Int!]!): Boolean!
-  createProduct(name: String!, price: Float!, count: Float!, isPublished: Boolean = false, delivery: Boolean = false, shipping: Boolean = false, pickup: Boolean = false, photos: [Int!]): Product!
-  updateProduct(name: String!, price: Float!, count: Float!, isPublished: Boolean = false, delivery: Boolean = false, shipping: Boolean = false, pickup: Boolean = false, photos: [Int!], id: Int!): Product!
+  createProduct(name: String!, price: Float!, count: Float!, isPublished: Boolean = false, delivery: Boolean = false, shipping: Boolean = false, pickup: Boolean = false, category: Int!, photos: [Int!]): Product!
+  updateProduct(name: String!, price: Float!, count: Float!, isPublished: Boolean = false, delivery: Boolean = false, shipping: Boolean = false, pickup: Boolean = false, category: Int!, photos: [Int!], id: Int!): Product!
   deleteProduct(id: [Int!]!): Boolean!
   deletePhoto(id: [Int!]!): Boolean!
   createProductIngredient(count: Float!, product: Float!, ingredient: Float!): ProductIngredient!

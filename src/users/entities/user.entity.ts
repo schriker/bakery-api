@@ -37,7 +37,11 @@ export class User {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  lastName?: string;
+  lastName: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  phone: string;
 
   @Field({ defaultValue: false })
   @Column({ default: false })

@@ -12,6 +12,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Index,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -33,6 +34,11 @@ export class Product {
   @Field()
   @Column()
   name: string;
+
+  @Field()
+  @Column()
+  @Index({ unique: true })
+  slug: string;
 
   @Field()
   @Column('decimal', { precision: 8, scale: 2 })

@@ -17,4 +17,10 @@ export class CategoriesService {
       },
     });
   }
+
+  findCategoryById(id: number) {
+    return this.categoryRepository.findOne({
+      where: { id: id },
+    });
+  }
 }
